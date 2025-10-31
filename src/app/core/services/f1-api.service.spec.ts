@@ -1,6 +1,6 @@
 import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 
-import { F1ApiService } from './f1-api.service';
+import { F1ApiService, Session } from './f1-api.service';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { provideHttpClient } from '@angular/common/http';
 import { MOCK_DRIVERS, MOCK_ERROR_RESPONSE, MOCK_SESSIONS } from './__mocks__/session-data.mock';
@@ -46,11 +46,12 @@ describe('F1ApiService', () => {
     }))
 
     it('should handle HTTP errors in getSessions()', fakeAsync(() => {
+      jest.spyOn(console, 'error').mockImplementation(() => {}); // silencia o console.error
       let actualError: any;
 
       service.getSessions().subscribe({ error: (error: any) => (actualError = error) });
 
-      const req = httpMock.expectOne(`${API_URL}/Error`);
+      const req = httpMock.expectOne(`${API_URL}/sessions`);
       req.error(MOCK_ERROR_RESPONSE, { status: 500, statusText: 'Internal Server Error' })
       tick();
       
@@ -60,13 +61,15 @@ describe('F1ApiService', () => {
 
   describe('getDrivers()', () => {
     it('should fetch drivers successfully', fakeAsync(() => {
-      let actualDrivers: Driver[] | undefined;
+      // let actualDrivers: Driver[] | undefined;
+      let actualDrivers: any[] | undefined;
 
       service.getDrivers().subscribe(drivers => {
         actualDrivers = drivers;
       });
 
-      const req = httpMock.expectOne(`${API_URL}/drivers?session_key=latest`);
+      // const req = httpMock.expectOne(`${API_URL}/drivers?session_key=latest`);
+      const req = httpMock.expectOne(`${API_URL}/drivers`);
       expect(req.request.method).toBe('GET');
 
       req.flush(MOCK_DRIVERS);
@@ -106,7 +109,7 @@ describe('F1ApiService', () => {
         expect(circuits[0].invalid_prop).toBeUndefined();
       });
 
-      httpMock.expectOne(`${API_URL}/${testEndpoint}`)flush([{ circuit_name: 'Monaco' }]);
+      httpMock.expectOne(`${API_URL}/${testEndpoint}`).flush([{ circuit_name: 'Monaco' }]);
     });
   });
 

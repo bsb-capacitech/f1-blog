@@ -1,0 +1,4 @@
+ng g c features/races/pages/races-list --standalone --skip-import
+ng g s features/races/pages/races-list/race-country
+ng g c features/races/pages/drivers-list --standalone --skip-import
+ng g c shared/components/navbar --standalone --skip-import

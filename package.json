@@ -9,7 +9,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:service": "jest src/app/core/services/f1-api.service.spec.ts"
+    "test:service": "jest src/app/core/services/f1-api.service.spec.ts",
+    "test:components": "jest --testMatch '**/src/app/features/**/*.spec.ts'",
+    "test:navbar": "jest src/app/shared/components/navbar/navbar.component.spec.ts"
   },
   "private": true,
   "dependencies": {
@@ -20,6 +22,7 @@
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
+    "bulma": "^1.0.4",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",
     "zone.js": "~0.15.0"

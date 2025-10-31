@@ -1,1 +1,12 @@
 /* You can add global styles to this file, and also import other style files */
+@use 'styles/variables' as var;
+@import 'bulma/css/bulma.min.css';
+
+body {
+  background-color: var.$f1-dark;
+  color: #fff;
+}
+
+.f1-header {
+  background-color: linear-gradient(135deg, var.$f1-black 0%, var.$f1-red 100%);
+}
