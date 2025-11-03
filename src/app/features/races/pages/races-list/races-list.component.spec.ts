@@ -18,12 +18,12 @@ describe('RacesListComponent', () => {
   };
 
   const mockRaceCountryService = {
-    getCountryService: jest.fn().mockReturnValue('BRA')
+    getCountryCode: jest.fn().mockReturnValue('BRA')
   };
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RacesListComponent],
+      imports: [RacesListComponent, ReactiveFormsModule],
       providers: [
         provideRouter([]),
         provideHttpClientTesting(),
@@ -51,7 +51,7 @@ describe('RacesListComponent', () => {
 
   it('should filter races when seasonFilter changes', () => {
     const select: HTMLSelectElement = fixture.nativeElement.querySelector('select');
-    select.value = '2024';
+    select.value = '2025';
     select.dispatchEvent(new Event('change'));    
     fixture.detectChanges();
 

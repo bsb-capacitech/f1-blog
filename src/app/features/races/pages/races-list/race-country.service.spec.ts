@@ -16,15 +16,15 @@ describe('RaceCountryService', () => {
   });
 
   it('should return country code for key', () => {
-    expect(service.getCountryService(1)).toBe('ESP');
-    expect(service.getCountryService(114)).toBe('MON');
-    expect(service.getCountryService(153)).toBe('KSA');
+    expect(service.getCountryCode(1)).toBe('ESP');
+    expect(service.getCountryCode(114)).toBe('MON');
+    expect(service.getCountryCode(153)).toBe('KSA');
   });
 
   it("should return empty string for key don't mapped", () => {
-    expect(service.getCountryService(999)).toBe('');
-    expect(service.getCountryService(0)).toBe('');
-    expect(service.getCountryService(-1)).toBe('');
+    expect(service.getCountryCode(999)).toBe('');
+    expect(service.getCountryCode(0)).toBe('');
+    expect(service.getCountryCode(-1)).toBe('');
   });
 
   it("should have all countries mapped", () => {
@@ -53,7 +53,7 @@ describe('RaceCountryService', () => {
     ]
 
     testCase.forEach(({ key, expected }) => {
-      expect(service.getCountryService(key)).toBe(expected);
+      expect(service.getCountryCode(key)).toBe(expected);
     })
   });
 });

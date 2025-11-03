@@ -6,21 +6,21 @@ export const MOCK_SESSIONS: Session[] = [
     meeting_key: 100,
     session_name: 'Practice 1',
     session_type: 'Practice',
-    date_start: '2024-05-01T10:00:00Z'
+    date_start: '2025-05-01T10:00:00Z'
   },
   {
     session_key: 2,
     meeting_key: 100,
     session_name: 'Qualifying 1',
     session_type: 'Qualifying',
-    date_start: '2024-05-01T14:00:00Z'
+    date_start: '2025-05-01T14:00:00Z'
   },
   {
     session_key: 1,
     meeting_key: 100,
     session_name: 'Race 1',
     session_type: 'Race',
-    date_start: '2024-05-02T15:00:00Z'
+    date_start: '2025-05-02T15:00:00Z'
   }
 ];
 

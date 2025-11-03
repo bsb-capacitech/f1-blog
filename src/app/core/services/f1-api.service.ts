@@ -8,6 +8,10 @@ export interface Session {
   session_name: string;
   session_type: string;
   date_start: string;
+  country_name: string;
+  country_code: string;
+  country_key: number;
+  circuit_short_name: string;
 }
 
 @Injectable({ providedIn: 'root' })
