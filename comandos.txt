@@ -1,6 +1,6 @@
 ng g c features/races/pages/race-details --standalone --skip-import
 ng g p shared/pipes/lap-time --standalone
-ng g s features/races/services/race-store --standalone
+ng g s features/races/services/race-store
 
 race-details.spec
   getEndpoint = jest.fn().mockImplementation((url: string) => {

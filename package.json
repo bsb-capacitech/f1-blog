@@ -15,7 +15,10 @@
     "test:drivers": "jest src/app/features/drivers/ src/app/shared/pipes/country-flag.pipe.spec.ts",
     "test:coverage:drivers": "jest src/app/features/drivers/ src/app/shared/pipes/country-flag.pipe.spec.ts --coverage",
     "test:pipes": "jest src/app/shared/pipes/",
-    "test:all": "npm run test:drivers && npm run test:pipes"
+    "test:all": "npm run test:drivers && npm run test:pipes",
+    "test:navigation": "jest src/app/features/races/pages/race-detail/ src/app/shared/pipes/lap-time.pipe.spec.ts src/app/features/races/services/race-store.service.spec.ts",
+    "test:coverage:navigation": "jest src/app/features/races/pages/race-detail/ src/app/shared/pipes/lap-time.pipe.spec.ts src/app/features/races/services/race-store.service.spec.ts --coverage",
+    "test:pipes:complex": "jest src/app/shared/pipes/lap-time.pipe.spec.ts"
   },
   "private": true,
   "dependencies": {
