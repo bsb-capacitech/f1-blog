@@ -68,8 +68,8 @@ describe('F1ApiService', () => {
         actualDrivers = drivers;
       });
 
-      // const req = httpMock.expectOne(`${API_URL}/drivers?session_key=latest`);
-      const req = httpMock.expectOne(`${API_URL}/drivers`);
+      const req = httpMock.expectOne(`${API_URL}/drivers?session_key=latest`);
+      // const req = httpMock.expectOne(`${API_URL}/drivers`);
       expect(req.request.method).toBe('GET');
 
       req.flush(MOCK_DRIVERS);

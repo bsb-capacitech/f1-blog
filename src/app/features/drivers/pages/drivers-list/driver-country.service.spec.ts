@@ -30,30 +30,30 @@ describe('DriverCountryService', () => {
 
   it('should coverage all mapped drivers', () => {
     const testCases = [
-      { driverNumber: 1, expect: 'NED' },
-      { driverNumber: 4, expect: 'GBR' },
-      { driverNumber: 5, expect: 'BRA' },
-      { driverNumber: 6, expect: 'FRA' },
-      { driverNumber: 10, expect: 'FRA' },
-      { driverNumber: 12, expect: 'ITA' },
-      { driverNumber: 14, expect: 'ESP' },
-      { driverNumber: 16, expect: 'MON' },
-      { driverNumber: 18, expect: 'CAN' },
-      { driverNumber: 22, expect: 'JPN' },
-      { driverNumber: 23, expect: 'THA' },
-      { driverNumber: 27, expect: 'GER' },
-      { driverNumber: 30, expect: 'NZL' },
-      { driverNumber: 31, expect: 'FRA' },
-      { driverNumber: 43, expect: 'ARG' },
-      { driverNumber: 44, expect: 'GBR' },
-      { driverNumber: 55, expect: 'ESP' },
-      { driverNumber: 63, expect: 'GBR' },
-      { driverNumber: 81, expect: 'AUS' },
-      { driverNumber: 87, expect: 'GBR' },
+      { driverNumber: 1, expected: 'NED' },
+      { driverNumber: 4, expected: 'GBR' },
+      { driverNumber: 5, expected: 'BRA' },
+      { driverNumber: 6, expected: 'FRA' },
+      { driverNumber: 10, expected: 'FRA' },
+      { driverNumber: 12, expected: 'ITA' },
+      { driverNumber: 14, expected: 'ESP' },
+      { driverNumber: 16, expected: 'MON' },
+      { driverNumber: 18, expected: 'CAN' },
+      { driverNumber: 22, expected: 'JPN' },
+      { driverNumber: 23, expected: 'THA' },
+      { driverNumber: 27, expected: 'GER' },
+      { driverNumber: 30, expected: 'NZL' },
+      { driverNumber: 31, expected: 'FRA' },
+      { driverNumber: 43, expected: 'ARG' },
+      { driverNumber: 44, expected: 'GBR' },
+      { driverNumber: 55, expected: 'ESP' },
+      { driverNumber: 63, expected: 'GBR' },
+      { driverNumber: 81, expected: 'AUS' },
+      { driverNumber: 87, expected: 'GBR' },
     ]
 
-    testCases.forEach(({ driverNumber, expect }) => {
-      expect(service.getCountryCode(driverNumber)).toBe(expect);
+    testCases.forEach(({ driverNumber, expected }) => {
+      expect(service.getCountryCode(driverNumber)).toBe(expected);
     });
   });
 });

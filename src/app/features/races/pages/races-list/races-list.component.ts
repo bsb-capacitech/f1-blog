@@ -4,10 +4,11 @@ import { RaceCountryService } from './race-country.service';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { CountryFlagPipe } from '../../../../shared/pipes/country-flag.pipe';
 
 @Component({
   selector: 'app-races-list',
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, CountryFlagPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="section">
@@ -43,7 +44,7 @@ import { RouterModule } from '@angular/router';
                 <div class="card f1-card">
                   <div class="card-content">
                     <p class="title is-4 has-text-warning">
-                      <span>{{ race.country_code }}</span>
+                      <span>{{ race.country_code | countryFlag }}</span>
                       {{ race.country_name }}
                     </p>
                     <p class="subtitle is-6 has-text-light">

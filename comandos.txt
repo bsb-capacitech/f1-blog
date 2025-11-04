@@ -1,250 +1,112 @@
-race-country.service.ts
-import { Injectable } from '@angular/core';
+ng g c features/races/pages/race-details --standalone --skip-import
+ng g p shared/pipes/lap-time --standalone
+ng g s features/races/services/race-store --standalone
 
-@Injectable({
-  providedIn: 'root'
-})
-export class RaceCountryService {
-  private readonly raceCountryMap: Record<number, string> = {
-    1: 'ESP',
-    2: 'GBR',
-    4: 'JPN',
-    5: 'AUS',
-    8: 'MEX',
-    10: 'BRA',
-    133: 'NED',
-    13: 'ITA',
-    14: 'HUN',
-    16: 'BEL',
-    17: 'AUT',
-    19: 'USA',
-    21: 'UAE',
-    30: 'AZE',
-    46: 'CAN',
-    36: 'BRN',
-    53: 'CHN',
-    114: 'MON',
-    149: 'QAT',
-    153: 'KSA',
-    157: 'SGP'
-  };
-
-  getCountryCode(countryKey: number): string {
-    return this.raceCountryMap[countryKey] ?? '';
-  }
-}
-
-races-list.component.ts
-import { Component, inject, signal, computed, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormControl } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
-import { F1ApiService, Session } from '../../../../core/services/f1-api.service';
-import { RaceCountryService } from './race-country.service';
-import { CountryFlagPipe } from '../../../../shared/pipes/country-flag.pipe';
-import { RaceStoreService } from '../../services/race-store.service';
-
-@Component({
-  selector: 'app-races-list',
-  standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, CountryFlagPipe],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <section class="section">
-      <div class="container">
-        <h1 class="title has-text-warning">Calendário de Corridas F1</h1>
-
-        <div class="field">
-          <label class="label has-text-white">Filtrar por Temporada:</label>
-          <div class="control">
-            <div class="select">
-              <select [formControl]="seasonFilter">
-                <option value="2025">2025</option>
-                <option value="2024">2024</option>
-                <option value="2023">2025</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        @if (loading()) {
-          <div class="has-text-centered">
-            <div class="loader"></div>
-            <p class="has-text-white">Carregando corridas...</p>
-          </div>
-        } @else if (error()) {
-          <div class="notification is-danger">{{ error() }}</div>
-        } @else if (filteredRaces().length === 0) {
-          <p class="has-text-light">Nenhuma corrida encontrada para o ano selecionado.</p>
-        } @else {
-          <div class="columns is-multiline">
-            @for (race of filteredRaces(); track race.session_key) {
-              <div class="column is-one-third">
-                <a [routerLink]="['/races', race.session_key]" class="f1-card-link" (click)="goToRaceDetail(race)">
-                  <div class="card f1-card">
-                    <div class="card-content">
-                      <p class="title is-4 has-text-warning">
-                        <span>{{ race.country_code | countryFlag }}</span>
-                        {{ race.country_name }}
-                      </p>
-                      <p class="subtitle is-6 has-text-light">
-                        <i class="has-text-light">{{ race.circuit_short_name }}</i>
-                        <span class="has-text-light"> • </span>
-                        {{ race.date_start | date:'dd/MMM' }}
-                      </p>
-                      <p class="has-text-light">{{ race.session_name }}</p>
-                      <div class="has-text-right mt-3">
-                        <span class="tag is-info is-light">Ver detalhes →</span>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </section>
-  `,
-  styles: [`
-    .f1-card {
-      background: linear-gradient(135deg, #1f1f27 0%, #15151e 100%);
-      border: 1px solid #e10600;
-      border-radius: 8px;
+race-details.spec
+  getEndpoint = jest.fn().mockImplementation((url: string) => {
+    if () return of([{ driver_number: 0, position: 1, number_of_laps: 10, dnf: false }]);
+    if () return of([{ driver_number: 0, lap_duration: 85000 }]);
+  });
+  getDrivers = jest.fn().mockReturnValue(
+    of([{ driver_number: 0, full_name: 'Test Driver', team_name: 'Test Team' }])
+  );
+  getSessions = jest.fn().mockReturnValue(of([
+    {
+      session_key: 123,
+      session_name: 'GP Teste',
+      country_code: 'BRA',
+      country_name: 'Brasil',
+      circuit_short_name: 'Interlagos',
+      date_start: '2025-03-10T00:00:00Z', // mesmo ano mostrado no select
+      meeting_key: 1234,
+      session_type: 'Race',
+      country_key: 10
     }
-    .loader {
-      border: 4px solid #f3f3f3;
-      border-top: 4px solid #e10600;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      animation: spin 2s linear infinite;
-      margin: 0 auto;
-    }
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .f1-card-link {
-      display: block;
-      transition: transform 0.2s ease;
-      
-      &:hover {
-        transform: translateY(-4px);
-        text-decoration: none;
-      }
-    }
-  `]
-})
-export class RacesListComponent implements OnInit {
-  private f1ApiService = inject(F1ApiService);
-  private countryService = inject(RaceCountryService);
-  private router = inject(Router);
-  private raceStore = inject(RaceStoreService);
-  
-  // Signals para estado reativo
-  races = signal<Session[]>([]);
-  loading = signal<boolean>(true);
-  error = signal<string | null>(null);
-  
-  // Filtro reativo
-  seasonFilter = new FormControl('2024');
+  ]));
 
-  // Computed signal para filtros
-  filteredRaces = computed(() => {
-    const season = this.seasonFilter.value;
-    return this.races().filter(race => 
-      race.date_start.includes(season || '2024')
-    );
+  // ...
+
+it('deve aplicar classe de pódio para posições 1 a 3', () => {
+    expect(comp.getRowClass({
+      position: 1,
+      driver_number: 0,
+      full_name: '',
+      team_name: '',
+      laps_completed: 0,
+      lap_time_best: 0,
+      status: 'DNF'
+    })).toHaveProperty('podium-first');
+    expect(comp.getRowClass({
+      position: 3,
+      driver_number: 0,
+      full_name: '',
+      team_name: '',
+      laps_completed: 0,
+      lap_time_best: 0,
+      status: 'DNF'
+    })).toHaveProperty('podium-first');
   });
 
-  ngOnInit() {
-    this.loadRaces();
-  }
+  it('deve aplicar classe de pontos para top 10', () => {
+    expect(comp.getRowClass({
+      position: 7,
+      driver_number: 0,
+      full_name: '',
+      team_name: '',
+      laps_completed: 0,
+      lap_time_best: 0,
+      status: 'DNF'
+    })).toHaveProperty('points-position');
+  });
 
-  private loadRaces() {
-    this.f1ApiService.getSessions().subscribe({
-      next: (sessions) => {
-        const raceSessions: Session[] = sessions.filter(session => 
-          session.session_type === 'Race'
-        );
-        const enrichedSessions: Session[] = raceSessions.map(session => ({
-          ...session,
-          country_code: this.countryService.getCountryCode(session.country_key)
-        }));
-        this.races.set(enrichedSessions);
-        this.loading.set(false);
-      },
-      error: (error) => {
-        console.error('Erro ao carregar corridas:', error);
-        this.error.set('Erro ao carregar corridas. Tente novamente.');
-        this.loading.set(false);
-      }
+  it('deve aplicar destaque de melhor volta', () => {
+    comp.results.set(
+      [
+        { lap_time_best: 1, driver_number: 0, position: 4, full_name: '', team_name: '', laps_completed: 0, status: 'DNF' }
+      ]
+    );
+
+    expect(comp.getRowClass({
+      position: 4,
+      driver_number: 0,
+      full_name: '',
+      team_name: '',
+      laps_completed: 0,
+      lap_time_best: 1,
+      status: 'DNF'
+    })).toHaveProperty('best-lap');
+  });
+
+  it('nenhuma classe deve estar ativa', () => {
+    const result = comp.getRowClass({
+      position: null,
+      driver_number: 0,
+      full_name: '',
+      team_name: '',
+      laps_completed: 0,
+      lap_time_best: 0,
+      status: 'DNF'
     });
-  }
+    expect().toBe();
+  });
 
-  goToRaceDetail(race: Session) {
-    this.raceStore.setRace(race);
-    this.router.navigate(['/races', race.session_key]);
-  }
-}
+race-store.spec
+  const mockRace: Session = {
+    session_key: 12345,
+    meeting_key: 100,
+    session_name: 'Spanish Grand Prix',
+    session_type: 'Race',
+    date_start: '2024-06-23T15:00:00Z',
+    country_name: 'Spain',
+    country_code: 'ESP',
+    country_key: 1,
+    circuit_short_name: 'Barcelona'
+  };
 
-drivers-list.component.ts
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-
-@Component({
-  selector: 'app-drivers-list',
-  standalone: true,
-  imports: [CommonModule, RouterModule],
-  template: `
-    <section class="section">
-      <div class="container">
-        <h1 class="title has-text-warning">Pilotos da F1</h1>
-        <p class="has-text-white">Em desenvolvimento - próxima aula!</p>
-        <a [routerLink]="/races" class="button is-warning mt4"><- Voltar para Corridas</a>
-      </div>
-    </section>
-  `
-})
-export class DriversListComponent { }
-
-navbar.component.ts
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
-
-@Component({
-  selector: 'app-navbar',
-  standalone: true,
-  imports: [RouterModule],
-  template: `
-    <nav class="navbar is-dark" role="navigation" aria-label="main navigation">
-      <div class="container">
-        <div class="navbar-brand">
-          <a class="navbar-item has-text-weight-bold has-text-warning" routerLink="/">
-            🏎️ F1 BLOG
-          </a>
-        </div>
-
-        <div class="navbar-menu">
-          <div class="navbar-start">
-            <a routerLink="/races" routerLinkActivate="is-active" aria-current="page">
-              Corridas
-            </a>
-            <a routerLink="/drivers" routerLinkActivate="is-active">
-              Pilotos
-            </a>
-          </div>
-        </div>
-      </div>
-    </nav>
-  `,
-  styles: [`
-    .navbar-item.is-active {
-      background: #e10600 !important;
-      color: white !important;
-    }
-  `]
-})
-export class NavbarComponent { }
+package.json
+  "scripts": {
+    ,
+    "test:navigation": "jest src/app/features/races/pages/race-detail/ src/app/shared/pipes/lap-time.pipe.spec.ts src/app/features/races/services/race-store.service.spec.ts",
+    "test:coverage:navigation": "jest src/app/features/races/pages/race-detail/ src/app/shared/pipes/lap-time.pipe.spec.ts src/app/features/races/services/race-store.service.spec.ts --coverage",
+    "test:pipes:complex": "jest src/app/shared/pipes/lap-time.pipe.spec.ts"
+  },

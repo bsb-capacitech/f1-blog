@@ -14,6 +14,15 @@ export interface Session {
   circuit_short_name: string;
 }
 
+export interface Driver {
+  driver_number: number;
+  name_acronym: string;
+  full_name: string;
+  country_code: string;
+  team_name: string;
+  headshot_url: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class F1ApiService {
   private http = inject(HttpClient);
@@ -28,8 +37,8 @@ export class F1ApiService {
     )
   }
 
-  getDrivers(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/drivers`);
+  getDrivers(): Observable<Driver[]> {
+    return this.http.get<Driver[]>(`${this.baseUrl}/drivers?session_key=latest`);
   }
 
   getEndpoint<T>(endpoint: string): Observable<T> {

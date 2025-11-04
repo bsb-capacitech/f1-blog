@@ -1,7 +1,7 @@
 import { DriverCountryService } from './driver-country.service';
 import { delay, of } from 'rxjs';
 import { fireEvent, render, screen } from '@testing-library/angular';
-import { DriversListComponent } from '../../../races/pages/drivers-list/drivers-list.component';
+import { DriversListComponent } from '../../../drivers/pages/drivers-list/drivers-list.component';
 import { signal } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { CountryFlagPipe } from '../../../../shared/pipes/country-flag.pipe';
@@ -36,7 +36,7 @@ describe('DriversListComponent', () => {
   it('should render driver cards after loading data', async () => {
     await render(DriversListComponent, {
       componentProperties: {
-        driver: signal([
+        drivers: signal([
           {
             full_name: 'Max Verstappen',
             country_name: 'Netherlands',
@@ -63,7 +63,7 @@ describe('DriversListComponent', () => {
   it('should filter drivers by team', async () => {
     const { fixture } = await render(DriversListComponent, {
       componentProperties: {
-        driver: signal([
+        drivers: signal([
           {
             full_name: 'Max Verstappen',
             team_name: 'Red Bull',
@@ -127,6 +127,6 @@ describe('DriversListComponent', () => {
 
     const url = fixture.componentInstance.getFallbackImageUrl('Max VERSTAPPEN');
 
-    expect(url).toContain('Max_Verstappen');
+    expect(url).toContain('Max_VERSTAPPEN');
   });
 });
