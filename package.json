@@ -11,7 +11,11 @@
     "test:coverage": "jest --coverage",
     "test:service": "jest src/app/core/services/f1-api.service.spec.ts",
     "test:components": "jest --testMatch '**/src/app/features/**/*.spec.ts'",
-    "test:navbar": "jest src/app/shared/components/navbar/navbar.component.spec.ts"
+    "test:navbar": "jest src/app/shared/components/navbar/navbar.component.spec.ts",
+    "test:drivers": "jest src/app/features/drivers/ src/app/shared/pipes/country-flag.pipe.spec.ts",
+    "test:coverage:drivers": "jest src/app/features/drivers/ src/app/shared/pipes/country-flag.pipe.spec.ts --coverage",
+    "test:pipes": "jest src/app/shared/pipes/",
+    "test:all": "npm run test:drivers && npm run test:pipes"
   },
   "private": true,
   "dependencies": {
