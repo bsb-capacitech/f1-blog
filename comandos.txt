@@ -1,112 +1,126 @@
 ng g c features/races/pages/race-details --standalone --skip-import
+
+
 ng g p shared/pipes/lap-time --standalone
-ng g s features/races/services/race-store
 
-race-details.spec
-  getEndpoint = jest.fn().mockImplementation((url: string) => {
-    if () return of([{ driver_number: 0, position: 1, number_of_laps: 10, dnf: false }]);
-    if () return of([{ driver_number: 0, lap_duration: 85000 }]);
-  });
-  getDrivers = jest.fn().mockReturnValue(
-    of([{ driver_number: 0, full_name: 'Test Driver', team_name: 'Test Team' }])
-  );
-  getSessions = jest.fn().mockReturnValue(of([
-    {
-      session_key: 123,
-      session_name: 'GP Teste',
-      country_code: 'BRA',
-      country_name: 'Brasil',
-      circuit_short_name: 'Interlagos',
-      date_start: '2025-03-10T00:00:00Z', // mesmo ano mostrado no select
-      meeting_key: 1234,
-      session_type: 'Race',
-      country_key: 10
+
+ng g s features/races/services/race-store --standalone
+
+
+race-details.component
+@Component({
+  imports: [CommonModule, RouterModule, LapTimePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  template: `
+    <section class="section">
+      <div class="container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+          <ul>
+            <li><a routerLink="/races" class="has-text-warning">Corridas</a></li>
+            <li class="is-active"><a aria-current="page">Detalhes</a></li>
+          </ul>
+        </nav>
+
+        <h1 class="title has-text-warning has-text-centered">Detalhes da Corrida</h1>
+        <h3 class="subtitle has-text-light has-text-centered">
+          {{ raceInfo()?.session_name }} •
+          <i>{{ raceInfo()?.country_code }} - {{ raceInfo()?.circuit_short_name }}</i>
+          ({{ raceInfo()?.date_start | date:'mediumDate' }})
+        </h3>
+
+        @if (isLoading()) {
+          <div class="has-text-centered mt-6">
+            <div class="loader"></div>
+            <p class="has-text-light">Carregando dados...</p>
+          </div>
+        } @else {
+          <div class="notification is-danger has-text-centered">{{ error() }}</div>
+        }
+
+        <!-- Conteúdo será implementado nos próximos passos -->
+        <div class="has-text-centered mt-5">
+          <!-- <button class="button is-warning">← Voltar</button> -->
+          <button class="button is-warning" (click)="goBack()">← Voltar</button>
+        </div>
+      </div>
+    </section>
+  `,
+  styles: [`
+    .loader {
+      border: 4px solid #333;
+      border-top: 4px solid #e10600;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin: auto;
     }
-  ]));
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .points-position { background-color: rgba(52, 152, 219, 0.15) !important; }
+    .podium-first { background-color: rgba(46, 204, 113, 0.2) !important; }
+    .best-lap { background-color: rgba(241, 196, 15, 0.2) !important; }
+  `]
+})
 
-  // ...
 
-it('deve aplicar classe de pódio para posições 1 a 3', () => {
-    expect(comp.getRowClass({
-      position: 1,
-      driver_number: 0,
-      full_name: '',
-      team_name: '',
-      laps_completed: 0,
-      lap_time_best: 0,
-      status: 'DNF'
-    })).toHaveProperty('podium-first');
-    expect(comp.getRowClass({
-      position: 3,
-      driver_number: 0,
-      full_name: '',
-      team_name: '',
-      laps_completed: 0,
-      lap_time_best: 0,
-      status: 'DNF'
-    })).toHaveProperty('podium-first');
-  });
+  template: `
+    <section class="section">
+      <div class="container">
+        <!-- Breadcrumb -->
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+          
+        </nav>
 
-  it('deve aplicar classe de pontos para top 10', () => {
-    expect(comp.getRowClass({
-      position: 7,
-      driver_number: 0,
-      full_name: '',
-      team_name: '',
-      laps_completed: 0,
-      lap_time_best: 0,
-      status: 'DNF'
-    })).toHaveProperty('points-position');
-  });
+        <h1 class="title has-text-warning has-text-centered">Detalhes da Corrida</h1>
+        <h3 class="subtitle has-text-light has-text-centered">
+          <!-- ... -->
+        </h3>
+        <h3 class="subtitle has-text-light has-text-centered">
+          {{ raceInfo()?.session_name }} •
+          <i>{{ raceInfo()?.country_code }} - {{ raceInfo()?.circuit_short_name }}</i>
+          ({{ raceInfo()?.date_start | date:'mediumDate' }})
+        </h3>
 
-  it('deve aplicar destaque de melhor volta', () => {
-    comp.results.set(
-      [
-        { lap_time_best: 1, driver_number: 0, position: 4, full_name: '', team_name: '', laps_completed: 0, status: 'DNF' }
-      ]
-    );
-
-    expect(comp.getRowClass({
-      position: 4,
-      driver_number: 0,
-      full_name: '',
-      team_name: '',
-      laps_completed: 0,
-      lap_time_best: 1,
-      status: 'DNF'
-    })).toHaveProperty('best-lap');
-  });
-
-  it('nenhuma classe deve estar ativa', () => {
-    const result = comp.getRowClass({
-      position: null,
-      driver_number: 0,
-      full_name: '',
-      team_name: '',
-      laps_completed: 0,
-      lap_time_best: 0,
-      status: 'DNF'
-    });
-    expect().toBe();
-  });
-
-race-store.spec
-  const mockRace: Session = {
-    session_key: 12345,
-    meeting_key: 100,
-    session_name: 'Spanish Grand Prix',
-    session_type: 'Race',
-    date_start: '2024-06-23T15:00:00Z',
-    country_name: 'Spain',
-    country_code: 'ESP',
-    country_key: 1,
-    circuit_short_name: 'Barcelona'
-  };
-
-package.json
-  "scripts": {
-    ,
-    "test:navigation": "jest src/app/features/races/pages/race-detail/ src/app/shared/pipes/lap-time.pipe.spec.ts src/app/features/races/services/race-store.service.spec.ts",
-    "test:coverage:navigation": "jest src/app/features/races/pages/race-detail/ src/app/shared/pipes/lap-time.pipe.spec.ts src/app/features/races/services/race-store.service.spec.ts --coverage",
-    "test:pipes:complex": "jest src/app/shared/pipes/lap-time.pipe.spec.ts"
-  },
+        @if (isLoading()) {
+          <!-- ... -->
+        } @else if (error()) {
+          <div> ... </div>
+        } @else {
+          <table class="table is-striped is-hoverable is-fullwidth has-text-centered mt-5">
+            <thead>
+              <tr>
+                <th>Posição</th>
+                <th>Piloto</th>
+                <th>Equipe</th>
+                <th>Voltas</th>
+                <th>Melhor Volta</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (result of results(); track result.driver_number) {
+                <tr [ngClass]="getRowClass(result)">
+                  <td>
+                    @switch (result.position) {
+                      @case (1) {<span>🏆 </span><strong>{{ result.position }}</strong>}
+                      @case (2) {<span>🥈 </span><strong>{{ result.position }}</strong>}
+                      @case (3) {<span>🥉 </span><strong>{{ result.position }}</strong>}
+                      @default {<strong>{{ result.position }}</strong>}
+                    }
+                  </td>
+                  <td>{{ result.full_name }}</td>
+                  <td>{{ result.team_name }}</td>
+                  <td>{{ result.laps_completed }}</td>
+                  <td>{{ result.lap_time_best | lapTime }}</td>
+                  <td>{{ result.status }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+  styles: [`
+    .points-position { background-color: rgba(52, 152, 219, 0.15) !important; }
+    .podium-first { background-color: rgba(46, 204, 113, 0.2) !important; }
+    .best-lap { background-color: rgba(241, 196, 15, 0.2) !important; }
+  `]

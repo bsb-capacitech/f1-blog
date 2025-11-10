@@ -69,15 +69,15 @@ import { DriverCountryService } from './driver-country.service';
     </section>
   `,
   styles: [`
-    .f1-driver-card {
+    .f1-card {
       background: linear-gradient(135deg, #1f1f27 0%, #15151e 100%);
       border: 1px solid #333;
-      border-radius: 12px;
-      transition: transform 0.2s ease, border-color 0.2s ease;
+      border-radius: 10px;
+      transition: transform 0.2s ease-in-out;
     }
-    .f1-driver-card:hover {
-      transform: translateY(-4px);
-      border-color: #e10600;
+    .f1-card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 15px #e10600;
     }
     .loader {
       border: 4px solid #333;

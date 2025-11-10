@@ -3,8 +3,9 @@ import { F1ApiService, Session } from '../../../../core/services/f1-api.service'
 import { RaceCountryService } from './race-country.service';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { CountryFlagPipe } from '../../../../shared/pipes/country-flag.pipe';
+import { RaceStoreService } from '../../services/race-store.service';
 
 @Component({
   selector: 'app-races-list',
@@ -41,24 +42,26 @@ import { CountryFlagPipe } from '../../../../shared/pipes/country-flag.pipe';
           <div class="columns is-multiline">
             @for (race of filteredRaces(); track race.session_key) {
               <div class="column is-one-third">
-                <div class="card f1-card">
-                  <div class="card-content">
-                    <p class="title is-4 has-text-warning">
-                      <span>{{ race.country_code | countryFlag }}</span>
-                      {{ race.country_name }}
-                    </p>
-                    <p class="subtitle is-6 has-text-light">
-                      <i class="has-text-light">{{ race.circuit_short_name }}</i>
-                      <span class="has-text-light"> • </span>
-                      {{ race.date_start | date: 'dd/MMM' }}
-                    </p>
-                    <p class="has-text-light">{{ race.session_name }}</p>
-
-                    <div class="has-text-right mt-3">
-                      <span class="tag is-inf is-light">Ver detalhes -></span>
+                <a [routerLink]="['/races', race.session_key]" class="f1-card-link" (click)="goToRaceDetail(race)">
+                  <div class="card f1-card">
+                    <div class="card-content">
+                      <p class="title is-4 has-text-warning">
+                        <span>{{ race.country_code | countryFlag }}</span>
+                        {{ race.country_name }}
+                      </p>
+                      <p class="subtitle is-6 has-text-light">
+                        <i class="has-text-light">{{ race.circuit_short_name }}</i>
+                        <span class="has-text-light"> • </span>
+                        {{ race.date_start | date: 'dd/MMM' }}
+                      </p>
+                      <p class="has-text-light">{{ race.session_name }}</p>
+  
+                      <div class="has-text-right mt-3">
+                        <span class="tag is-inf is-light">Ver detalhes -></span>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </a>
               </div>
             }
           </div>
@@ -85,11 +88,22 @@ import { CountryFlagPipe } from '../../../../shared/pipes/country-flag.pipe';
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }  
+    .f1-card-link {
+      display: block;
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: translateY(-4px);
+        text-decoration: none;
+      }
+    }
   `]
 })
 export class RacesListComponent implements OnInit {
   private f1ApiService = inject(F1ApiService);
   private countryService = inject(RaceCountryService);
+  private router = inject(Router);
+  private raceStore = inject(RaceStoreService);
 
   races = signal<Session[]>([]);
   loading = signal<boolean>(true);
@@ -123,5 +137,10 @@ export class RacesListComponent implements OnInit {
         this.loading.set(false);
       }
     });
+  }
+
+  goToRaceDetail(race: Session) {
+    this.raceStore.setRace(race);
+    this.router.navigate(['/races', race.session_key]);
   }
 }
