@@ -57,7 +57,8 @@ describe('PostsListComponent', () => {
     fixture.detectChanges();
 
     expect(comp.filteredPosts().length).toBe(1);
-    expect(comp.filteredPosts()[0].raceSessioKey).toBe('100');
+    // expect(comp.filteredPosts()[0].raceSessioKey).toBe('100');
+    expect(comp.filteredPosts()[0].raceSessionKey).toBe('100');
   });
 
   it('should open confirmation modal and delete when confirmed', async () => {

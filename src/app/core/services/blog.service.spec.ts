@@ -19,20 +19,23 @@ describe('BlogService', () => {
     const payload = {
       title: 'Novo Post',
       content: 'Conteúdo do novo post com texto suficiente...',
-      raceSessioKey: '300',
+      // raceSessioKey: '300',
+      raceSessionKey: '300',
       author: 'Test Author'
     };
     service.createPost(payload);
 
     const posts = service.posts();
 
-    expect(posts.lenght).toBe(1);
+    // expect(posts.lenght).toBe(1);
+    expect(posts.length).toBe(1);
     expect(posts[0].title).toBe(payload.title);
     expect(posts[0].id).toBeDefined();
     expect(posts[0].createdAt).toBeInstanceOf(Date);
 
     const raw = JSON.parse(localStorage.getItem('f1-blog-posts') || '[]');
-    expect(raw.lenght).toBe(1);
+    // expect(raw.lenght).toBe(1);
+    expect(raw.length).toBe(1);
     expect(raw[0].title).toBe(payload.title);
   });
 
@@ -40,7 +43,8 @@ describe('BlogService', () => {
     service.createPost({
       title: 'Original',
       content: 'Conteúdo original',
-      raceSessioKey: '100',
+      // raceSessioKey: '100',
+      raceSessionKey: '100',
       author: 'Author'
     });
     const post = service.posts()[0];
@@ -49,14 +53,16 @@ describe('BlogService', () => {
 
     const updated = service.getPost(post.id);
 
-    expect(updated.title).toBe('Atualizado');
+    // expect(updated.title).toBe('Atualizado');
+    expect(updated!.title).toBe('Atualizado');
   });
 
   it('existsTitleInRace should detect duplicates (case-insensitive)', () => {
     service.createPost({
       title: 'Meu Título',
       content: 'c',
-      raceSessioKey: '55',
+      // raceSessioKey: '55',
+      raceSessionKey: '55',
       author: 'a'
     });
     expect(service.existsTitleInRace('meu título', '55')).toBeTruthy();
