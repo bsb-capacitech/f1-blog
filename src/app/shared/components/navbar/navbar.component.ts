@@ -51,6 +51,9 @@ import { RouterModule } from '@angular/router';
             <a class="navbar-item" routerLink="/drivers" routerLinkActivate="is-active">
               Pilotos
             </a>
+            <a class="navbar-item" routerLink="/blog" routerLinkActivate="is-active">
+              Blog
+            </a>
           </div>
         </div>
       </div>

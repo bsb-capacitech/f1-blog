@@ -10,6 +10,24 @@ export const routes: Routes = [
   {
     path: 'drivers', loadComponent: () => import('./features/drivers/pages/drivers-list/drivers-list.component').then(c => c.DriversListComponent)
   },
+  {
+    path: 'blog',
+    loadComponent: () => 
+      import('./features/blog/pages/posts-list/posts-list.component')
+        .then(c => c.PostsListComponent)
+  },
+  {
+    path: 'blog/new',
+    loadComponent: () => 
+      import('./features/blog/pages/post-form/post-form.component')
+        .then(c => c.PostFormComponent)
+  },
+  {
+    path: 'blog/edit/:id',
+    loadComponent: () => 
+      import('./features/blog/pages/post-form/post-form.component')
+        .then(c => c.PostFormComponent)
+  },
   { path: '', redirectTo: 'races', pathMatch: 'full' },
   { path: '**', redirectTo: 'races' }
 ];

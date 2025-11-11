@@ -6,6 +6,7 @@ ng g c features/blog/pages/post-form --standalone --skip-import
 
 ng g c features/blog/pages/posts-list --standalone --skip-import
 
+
 blog-post.interface
 export interface BlogPost {
   id: string;
@@ -17,58 +18,292 @@ export interface BlogPost {
   excerpt?: string;
 }
 
-test-utils.ts
-export function createMockPost(overrides = {}) {
-  return {
-    id: 'id_' + Math.random().toString(36).slice(2),
-    title: 'Título de teste',
-    content: 'Conteúdo '.repeat(10),
-    raceSessionKey: '100',
-    author: 'Autor Teste',
-    createdAt: new Date(),
-    ...overrides
-  };
-}
+post-form.component
+  template: `
+    <section class="section">
+      <div class="container">
+        <nav class="breadcrumb" aria-label="breadcrumbs">
+          <ul>
+            <li><a routerLink="/blog" class="has-text-warning">Blog</a></li>
+            <li class="is-active">
+              <a aria-current="page">{{ isEditMode() ? 'Editar Post' : 'Novo Post' }}</a>
+            </li>
+          </ul>
+        </nav>
 
-post-form.spec
-const mockF1ApiService = {
-  getSessions: jest.fn().mockReturnValue(of([
-    { session_key: '100', session_type: 'Race', circuit_short_name: 'GP', date_start: '2025-03-10T00:00:00Z' }
-  ]))
-};
+        <h1 class="title has-text-warning">
+          {{ isEditMode() ? 'Editar Post' : 'Criar Novo Post' }}
+        </h1>
 
-  const mockBlogService = {
-    existsTitleInRace: jest.fn().mockReturnValue(false),
-    createPost: jest.fn(),
-    updatePost: jest.fn(),
-    getPost: jest.fn()
-  };
+        <form [formGroup]="postForm" (ngSubmit)="onSubmit()" class="box f1-card">
+          <!-- Título -->
+          <div class="field">
+            <label class="label has-text-white" for="title">Título</label>
+            <div class="control">
+              <input 
+                id="title"
+                class="input" 
+                type="text" 
+                formControlName="title"
+                placeholder="Ex: Análise da Corrida no Bahrain..."
+                [class.is-danger]="title.invalid && title.touched"
+                [class.is-success]="title.valid && title.touched"
+              >
+            </div>
+            @if (title.invalid && title.touched) {
+              <p class="help is-danger">
+                @if (title.errors?.['required']) { Título é obrigatório }
+                @if (title.errors?.['minlength']) { Mínimo 5 caracteres }
+                @if (title.errors?.['maxLength']) { Máximo 100 caracteres }
+              </p>
+            }
+          </div>
 
-posts-list.spec
-  const mockF1ApiService = {
-    getSessions: jest.fn().mockReturnValue(of([
-      { session_key: '100', session_type: 'Race', circuit_short_name: 'GP' }
-    ]))
-  };
+          <!-- Corrida Relacionada -->
+          <div class="field">
+            <label class="label has-text-white" for="raceSelect">Corrida Relacionada</label>
+            <div class="control">
+              <div class="select is-fullwidth">
+                <select id="raceSelect" formControlName="raceSessionKey"
+                  [class.is-danger]="raceSessionKey.invalid && raceSessionKey.touched"
+                  [class.is-success]="raceSessionKey.valid && raceSessionKey.touched">
+                  <option value="">Selecione uma corrida</option>
+                  @for (race of races(); track race.session_key) {
+                    <option [value]="race.session_key">
+                      {{ race.circuit_short_name }} - {{ race.date_start | date:'dd/MM/yyyy' }}
+                    </option>
+                  }
+                </select>
+              </div>
+            </div>
+            @if (raceSessionKey.invalid && raceSessionKey.touched) {
+              <p class="help is-danger">Selecione uma corrida</p>
+            }
+          </div>
 
-  const mockPosts = [
-    createMockPost({ title: 'A' , raceSessionKey: '100' }),
-    createMockPost({ title: 'B', raceSessionKey: '200' })
-  ];
+          <!-- Conteúdo -->
+          <div class="field">
+            <label class="label has-text-white" for="content">Conteúdo</label>
+            <div class="control">
+              <textarea 
+                id="content"
+                class="textarea" 
+                formControlName="content"
+                rows="10"
+                placeholder="Escreva sua análise da corrida..."
+                [class.is-danger]="content.invalid && content.touched"
+                [class.is-success]="content.valid && content.touched"
+              ></textarea>
+            </div>
+            @if (content.invalid && content.touched) {
+              <p class="help is-danger">
+                @if (content.errors?.['required']) { Conteúdo é obrigatório }
+                @if (content.errors?.['minlength']) { Mínimo 50 caracteres }
+              </p>
+            }
+            <p class="help has-text-light">
+              {{ content.value?.length || 0 }} / 50 caracteres mínimos
+            </p>
+          </div>
 
-  const mockBlogService = {
-    posts: signal(mockPosts),
-    sortedPosts: signal(mockPosts),
-    deletePost: jest.fn(),
-    getPost: jest.fn()
-  };
+          <!-- Autor -->
+          <div class="field">
+            <label class="label has-text-white" for="author">Autor</label>
+            <div class="control">
+              <input
+                id="author" 
+                class="input" 
+                type="text" 
+                formControlName="author"
+                placeholder="Seu nome"
+                [class.is-danger]="author.invalid && author.touched"
+              >
+            </div>
+            @if (author.invalid && author.touched) {
+              <p class="help is-danger">Autor é obrigatório</p>
+            }
+          </div>
 
-package.json
-{
-  "scripts": {
-    "test:blog:service": "jest, src/app/core/services/blog.service.spec.ts",
-    "test:blog:components": "jest src/app/features/blog/pages/",
-    "test:blog:coverage": "jest src/app/features/blog/ src/app/core/services/blog.service.spec.ts --coverage",
-    "test:blog:all": "npm run test:blog:service && npm run test:blog:components"
-  }
-}
+          <!-- Actions -->
+          <div class="field is-grouped">
+            <div class="control">
+              <button 
+                type="submit" 
+                class="button is-warning"
+                [disabled]="postForm.invalid || isLoading()"
+              >
+                {{ isEditMode() ? 'Atualizar' : 'Criar' }} Post
+              </button>
+            </div>
+            <div class="control">
+              <button type="button" class="button is-light" routerLink="/blog">
+                Cancelar
+              </button>
+            </div>
+          </div>
+
+          @if (error()) {
+            <div class="notification is-danger mt-4">
+              {{ error() }}
+            </div>
+          }
+        </form>
+      </div>
+    </section>
+  `,
+  styles: [`
+    .f1-card {
+      background: linear-gradient(135deg, #1f1f27 0%, #15151e 100%);
+      border: 1px solid #333;
+    }
+    .textarea {
+      min-height: 200px;
+      resize: vertical;
+    }
+  `]
+
+posts-list.component
+  template: `
+    <section class="section">
+      <div class="container">
+        <div class="level">
+          <div class="level-left">
+            <h1 class="title has-text-warning">Blog F1</h1>
+          </div>
+          <div class="level-right">
+            <a class="button is-warning" routerLink="/blog/new">
+              <span class="icon">✏️</span>
+              <span>Novo Post</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Filtro por Corrida -->
+        <div class="field">
+          <label class="label has-text-white">Filtrar por Corrida:</label>
+          <div class="control">
+            <div class="select">
+              <select [value]="selectedRaceFilter()" (change)="onRaceFilterChange($event)">
+                <option value="">Todas as corridas</option>
+                @for (race of availableRaces(); track race.session_key) {
+                  <option [value]="race.session_key">
+                    {{ race.circuit_short_name }}
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de Posts -->
+        @if (filteredPosts().length === 0) {
+          <div class="has-text-centered py-6">
+            <p class="title is-4 has-text-white">Nenhum post encontrado</p>
+            <p class="has-text-light">Comece criando seu primeiro post sobre F1!</p>
+            <a class="button is-warning mt-4" routerLink="/blog/new">
+              Criar Primeiro Post
+            </a>
+          </div>
+        } @else {
+          <div class="columns is-multiline">
+            @for (post of filteredPosts(); track post.id) {
+              <div class="column is-one-third">
+                <div class="card f1-card">
+                  <div class="card-content">
+                    <p class="title is-5 has-text-warning mb-2">
+                      {{ post.title }}
+                    </p>
+                    
+                    <p class="has-text-light mb-3">
+                      <small>
+                        Por <strong>{{ post.author }}</strong> em 
+                        {{ post.createdAt | date:'dd/MM/yyyy' }}
+                      </small>
+                    </p>
+
+                    <p class="has-text-light mb-4">
+                      {{ (post.content.length > 150 ? post.content.substring(0, 150) + '...' : post.content) }}
+                    </p>
+
+                    <div class="tags">
+                      <span class="tag is-info is-light">
+                        {{ getRaceName(post.raceSessionKey) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <footer class="card-footer">
+                    <a class="card-footer-item has-text-info" [routerLink]="['/blog/edit', post.id]">
+                      Editar
+                    </a>
+                    <a class="card-footer-item has-text-danger" (click)="confirmDelete(post)">
+                      Excluir
+                    </a>
+                  </footer>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Modal de Confirmação -->
+        @if (showDeleteModal()) {
+          <div class="modal is-active">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+              <header class="modal-card-head">
+                <p class="modal-card-title has-text-white">Confirmar Exclusão</p>
+              </header>
+              <section class="modal-card-body">
+                <p class="has-text-white">
+                  Tem certeza que deseja excluir o post "{{ postToDelete()?.title }}"?
+                </p>
+                <p class="has-text-light is-size-7 mt-2">
+                  Esta ação não pode ser desfeita.
+                </p>
+              </section>
+              <footer class="modal-card-foot">
+                <button class="button is-danger" (click)="deletePost()">Excluir</button>
+                <button class="button is-light" (click)="cancelDelete()">Cancelar</button>
+              </footer>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  `,
+  styles: [`
+    .f1-card {
+      background: linear-gradient(135deg, #1f1f27 0%, #15151e 100%);
+      border: 1px solid #333;
+      transition: transform 0.2s ease;
+    }
+    .f1-card:hover {
+      transform: translateY(-2px);
+      border-color: #e10600;
+    }
+    .card-footer-item {
+      border-color: #333 !important;
+    }
+  `]
+
+app.routes
+,
+  {
+    path: 'blog',
+    loadComponent: () => 
+      import('./features/blog/pages/posts-list/posts-list.component')
+        .then(c => c.PostsListComponent)
+  },
+  {
+    path: 'blog/new',
+    loadComponent: () => 
+      import('./features/blog/pages/post-form/post-form.component')
+        .then(c => c.PostFormComponent)
+  },
+  {
+    path: 'blog/edit/:id',
+    loadComponent: () => 
+      import('./features/blog/pages/post-form/post-form.component')
+        .then(c => c.PostFormComponent)
+  },
