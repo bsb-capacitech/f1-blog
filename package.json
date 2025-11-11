@@ -18,7 +18,11 @@
     "test:all": "npm run test:drivers && npm run test:pipes",
     "test:navigation": "jest src/app/features/races/pages/race-detail/ src/app/shared/pipes/lap-time.pipe.spec.ts src/app/features/races/services/race-store.service.spec.ts",
     "test:coverage:navigation": "jest src/app/features/races/pages/race-detail/ src/app/shared/pipes/lap-time.pipe.spec.ts src/app/features/races/services/race-store.service.spec.ts --coverage",
-    "test:pipes:complex": "jest src/app/shared/pipes/lap-time.pipe.spec.ts"
+    "test:pipes:complex": "jest src/app/shared/pipes/lap-time.pipe.spec.ts",
+    "test:blog:service": "jest, src/app/core/services/blog.service.spec.ts",
+    "test:blog:components": "jest src/app/features/blog/pages/",
+    "test:blog:coverage": "jest src/app/features/blog/ src/app/core/services/blog.service.spec.ts --coverage",
+    "test:blog:all": "npm run test:blog:service && npm run test:blog:components"
   },
   "private": true,
   "dependencies": {

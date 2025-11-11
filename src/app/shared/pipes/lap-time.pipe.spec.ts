@@ -6,7 +6,7 @@ describe('LapTimePipe', () => {
   beforeEach(() => (pipe = new LapTimePipe));
 
   it('should convert miliseconds for min:sec.mil format', () => {
-    expect(pipe.transform(85264)).toBe('1:25.234');
+    expect(pipe.transform(85234)).toBe('1:25.234');
   });
 
   it('should return "DNF" for 0 values', () => {

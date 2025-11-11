@@ -1,126 +1,74 @@
-ng g c features/races/pages/race-details --standalone --skip-import
+ng g i shared/interfaces/blog-post
 
+ng g s core/services/blog
 
-ng g p shared/pipes/lap-time --standalone
+ng g c features/blog/pages/post-form --standalone --skip-import
 
+ng g c features/blog/pages/posts-list --standalone --skip-import
 
-ng g s features/races/services/race-store --standalone
+blog-post.interface
+export interface BlogPost {
+  id: string;
+  title: string;
+  content: string;
+  raceSessionKey: string;
+  createdAt: Date;
+  author: string;
+  excerpt?: string;
+}
 
+test-utils.ts
+export function createMockPost(overrides = {}) {
+  return {
+    id: 'id_' + Math.random().toString(36).slice(2),
+    title: 'Título de teste',
+    content: 'Conteúdo '.repeat(10),
+    raceSessionKey: '100',
+    author: 'Autor Teste',
+    createdAt: new Date(),
+    ...overrides
+  };
+}
 
-race-details.component
-@Component({
-  imports: [CommonModule, RouterModule, LapTimePipe],
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <section class="section">
-      <div class="container">
-        <!-- Breadcrumb -->
-        <nav class="breadcrumb" aria-label="breadcrumbs">
-          <ul>
-            <li><a routerLink="/races" class="has-text-warning">Corridas</a></li>
-            <li class="is-active"><a aria-current="page">Detalhes</a></li>
-          </ul>
-        </nav>
+post-form.spec
+const mockF1ApiService = {
+  getSessions: jest.fn().mockReturnValue(of([
+    { session_key: '100', session_type: 'Race', circuit_short_name: 'GP', date_start: '2025-03-10T00:00:00Z' }
+  ]))
+};
 
-        <h1 class="title has-text-warning has-text-centered">Detalhes da Corrida</h1>
-        <h3 class="subtitle has-text-light has-text-centered">
-          {{ raceInfo()?.session_name }} •
-          <i>{{ raceInfo()?.country_code }} - {{ raceInfo()?.circuit_short_name }}</i>
-          ({{ raceInfo()?.date_start | date:'mediumDate' }})
-        </h3>
+  const mockBlogService = {
+    existsTitleInRace: jest.fn().mockReturnValue(false),
+    createPost: jest.fn(),
+    updatePost: jest.fn(),
+    getPost: jest.fn()
+  };
 
-        @if (isLoading()) {
-          <div class="has-text-centered mt-6">
-            <div class="loader"></div>
-            <p class="has-text-light">Carregando dados...</p>
-          </div>
-        } @else {
-          <div class="notification is-danger has-text-centered">{{ error() }}</div>
-        }
+posts-list.spec
+  const mockF1ApiService = {
+    getSessions: jest.fn().mockReturnValue(of([
+      { session_key: '100', session_type: 'Race', circuit_short_name: 'GP' }
+    ]))
+  };
 
-        <!-- Conteúdo será implementado nos próximos passos -->
-        <div class="has-text-centered mt-5">
-          <!-- <button class="button is-warning">← Voltar</button> -->
-          <button class="button is-warning" (click)="goBack()">← Voltar</button>
-        </div>
-      </div>
-    </section>
-  `,
-  styles: [`
-    .loader {
-      border: 4px solid #333;
-      border-top: 4px solid #e10600;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      animation: spin 1s linear infinite;
-      margin: auto;
-    }
-    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    .points-position { background-color: rgba(52, 152, 219, 0.15) !important; }
-    .podium-first { background-color: rgba(46, 204, 113, 0.2) !important; }
-    .best-lap { background-color: rgba(241, 196, 15, 0.2) !important; }
-  `]
-})
+  const mockPosts = [
+    createMockPost({ title: 'A' , raceSessionKey: '100' }),
+    createMockPost({ title: 'B', raceSessionKey: '200' })
+  ];
 
+  const mockBlogService = {
+    posts: signal(mockPosts),
+    sortedPosts: signal(mockPosts),
+    deletePost: jest.fn(),
+    getPost: jest.fn()
+  };
 
-  template: `
-    <section class="section">
-      <div class="container">
-        <!-- Breadcrumb -->
-        <nav class="breadcrumb" aria-label="breadcrumbs">
-          
-        </nav>
-
-        <h1 class="title has-text-warning has-text-centered">Detalhes da Corrida</h1>
-        <h3 class="subtitle has-text-light has-text-centered">
-          <!-- ... -->
-        </h3>
-        <h3 class="subtitle has-text-light has-text-centered">
-          {{ raceInfo()?.session_name }} •
-          <i>{{ raceInfo()?.country_code }} - {{ raceInfo()?.circuit_short_name }}</i>
-          ({{ raceInfo()?.date_start | date:'mediumDate' }})
-        </h3>
-
-        @if (isLoading()) {
-          <!-- ... -->
-        } @else if (error()) {
-          <div> ... </div>
-        } @else {
-          <table class="table is-striped is-hoverable is-fullwidth has-text-centered mt-5">
-            <thead>
-              <tr>
-                <th>Posição</th>
-                <th>Piloto</th>
-                <th>Equipe</th>
-                <th>Voltas</th>
-                <th>Melhor Volta</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (result of results(); track result.driver_number) {
-                <tr [ngClass]="getRowClass(result)">
-                  <td>
-                    @switch (result.position) {
-                      @case (1) {<span>🏆 </span><strong>{{ result.position }}</strong>}
-                      @case (2) {<span>🥈 </span><strong>{{ result.position }}</strong>}
-                      @case (3) {<span>🥉 </span><strong>{{ result.position }}</strong>}
-                      @default {<strong>{{ result.position }}</strong>}
-                    }
-                  </td>
-                  <td>{{ result.full_name }}</td>
-                  <td>{{ result.team_name }}</td>
-                  <td>{{ result.laps_completed }}</td>
-                  <td>{{ result.lap_time_best | lapTime }}</td>
-                  <td>{{ result.status }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        }
-  styles: [`
-    .points-position { background-color: rgba(52, 152, 219, 0.15) !important; }
-    .podium-first { background-color: rgba(46, 204, 113, 0.2) !important; }
-    .best-lap { background-color: rgba(241, 196, 15, 0.2) !important; }
-  `]
+package.json
+{
+  "scripts": {
+    "test:blog:service": "jest, src/app/core/services/blog.service.spec.ts",
+    "test:blog:components": "jest src/app/features/blog/pages/",
+    "test:blog:coverage": "jest src/app/features/blog/ src/app/core/services/blog.service.spec.ts --coverage",
+    "test:blog:all": "npm run test:blog:service && npm run test:blog:components"
+  }
+}

@@ -8,7 +8,7 @@ import { catchError, map } from 'rxjs/operators';
 import { RaceStoreService } from '../../services/race-store.service';
 
 interface DriverRaceResult {
-  position: number;
+  position: number | null;
   driver_number: number;
   full_name: string;
   team_name: string;
@@ -200,8 +200,10 @@ export class RaceDetailsComponent implements OnInit {
 
   getRowClass(result: DriverRaceResult) {
     return {
-      'podium-first': result.position <= 3 && result.position !== null,
-      'points-position': result.position <= 10 && result.position !== null,
+      // 'podium-first': result.position <= 3 && result.position !== null,
+      'podium-first': result.position! <= 3 && result.position !== null,
+      // 'points-position': result.position <= 10 && result.position !== null,
+      'points-position': result.position! <= 10 && result.position !== null,
       'best-lap': result.lap_time_best === this.bestRaceLap(),
     };
   }

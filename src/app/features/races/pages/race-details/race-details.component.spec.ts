@@ -1,13 +1,12 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 
 import { RaceDetailsComponent } from './race-details.component';
 import { of } from 'rxjs';
-import { render } from '@testing-library/angular';
+import { render, screen } from '@testing-library/angular';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { F1ApiService } from '../../../../core/services/f1-api.service';
-import { screen } from '@testing-library/dom';
 
 class MockF1ApiService {
   getEndpoint = jest.fn().mockImplementation((url: string) => {
@@ -30,18 +29,18 @@ class MockF1ApiService {
   }]));
 }
 
-describe('RaceDetailsComponent - Roteamento', () => {
+describe('RaceDetailsComponent - Routing', () => {
   it('should capture the sessionKey route parameter', async () => {
     await render(RaceDetailsComponent, {
       providers: [
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map([['sessionKey', '123']]) } } },
-        { provide: F1ApiService, useValue: MockF1ApiService }
+        { provide: F1ApiService, useClass: MockF1ApiService }
       ]
     });
 
-    expect(screen.getAllByAltText(/corrida/i).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/corrida/i).length).toBeGreaterThan(0);
   });
 
   it('should execute navigation to call goBack()', async () => {
@@ -51,7 +50,7 @@ describe('RaceDetailsComponent - Roteamento', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map() } } },
-        { provide: F1ApiService, useValue: MockF1ApiService }
+        { provide: F1ApiService, useClass: MockF1ApiService }
       ]
     });
 
@@ -64,8 +63,8 @@ describe('RaceDetailsComponent - Roteamento', () => {
   });
 });
 
-describe('RaceDetailsComponent - Estilos condicionais', () => {
-  let fixture;
+describe('RaceDetailsComponent - Conditional styles', () => {
+  // let fixture;
   let comp: RaceDetailsComponent;
 
   beforeEach(() => {
@@ -75,10 +74,11 @@ describe('RaceDetailsComponent - Estilos condicionais', () => {
         provideHttpClient(),
         provideHttpClientTesting(),
         { provide: ActivatedRoute, useValue: { snapshot: { paramMap: new Map([['sessionKey', '123']]) } } },
-        { provide: F1ApiService, useValue: MockF1ApiService }
+        { provide: F1ApiService, useClass: MockF1ApiService }
       ]
     });
-    fixture = TestBed.createComponent(RaceDetailsComponent);
+    // fixture = TestBed.createComponent(RaceDetailsComponent);
+    const fixture = TestBed.createComponent(RaceDetailsComponent);
     comp = fixture.componentInstance;
   });
 
