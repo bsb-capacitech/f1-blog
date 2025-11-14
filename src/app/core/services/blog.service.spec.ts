@@ -19,7 +19,6 @@ describe('BlogService', () => {
     const payload = {
       title: 'Novo Post',
       content: 'Conteúdo do novo post com texto suficiente...',
-      // raceSessioKey: '300',
       raceSessionKey: '300',
       author: 'Test Author'
     };
@@ -27,7 +26,6 @@ describe('BlogService', () => {
 
     const posts = service.posts();
 
-    // expect(posts.lenght).toBe(1);
     expect(posts.length).toBe(1);
     expect(posts[0].title).toBe(payload.title);
     expect(posts[0].id).toBeDefined();
@@ -43,7 +41,6 @@ describe('BlogService', () => {
     service.createPost({
       title: 'Original',
       content: 'Conteúdo original',
-      // raceSessioKey: '100',
       raceSessionKey: '100',
       author: 'Author'
     });
@@ -61,7 +58,6 @@ describe('BlogService', () => {
     service.createPost({
       title: 'Meu Título',
       content: 'c',
-      // raceSessioKey: '55',
       raceSessionKey: '55',
       author: 'a'
     });

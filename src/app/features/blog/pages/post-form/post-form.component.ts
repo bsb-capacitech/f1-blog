@@ -62,9 +62,6 @@ function uniqueTitleValidator(blogService: BlogService, getCurrentId: () => stri
                 @if (title.errors?.['maxLength']) { Máximo 100 caracteres }
               </p>
             }
-            <!-- @if (postForm.errors?.['titleExists'] && postForm.dirty) {
-              <p class="help is-danger">Título já existe para essa corrida</p>
-            } -->
             @if (postForm.errors?.['titleExists'] && postForm.dirty) {
               <p class="help is-danger">Título já existe para essa corrida</p>
             }

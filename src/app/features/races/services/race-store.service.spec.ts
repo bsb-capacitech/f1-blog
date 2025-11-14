@@ -53,3 +53,31 @@ describe('RaceStoreService', () => {
     expect(service.selectedRace()?.session_name).toBe('Monaco Grand Prix');
   });
 });
+
+describe('RaceStoreService (integration)', () => {
+  let service: RaceStoreService;
+  const race: Session = {
+    session_key: 10,
+    meeting_key: 99,
+    session_name: 'Austrian GP',
+    session_type: 'Race',
+    date_start: '2025-07-14T10:00:00Z',
+    country_name: 'Austria',
+    country_code: 'AUT',
+    country_key: 17,
+    circuit_short_name: 'Red Bull Ring'
+  }
+
+  beforeEach(() => {
+    service = new RaceStoreService();
+  });
+
+  it('should persist and clear run correctly', () => {
+    service.setRace(race);
+
+    expect(service.selectedRace()?.session_name).toBe('Austrian GP');
+
+    service.clear();
+    expect(service.selectedRace()).toBeNull();
+  });
+});

@@ -9,4 +9,9 @@ module.exports = {
       { tsconfig: '<rootDir>/tsconfig.spec.json' },
     ],
   },
+  transformIgnorePatterns: [
+    'node_modules/(?!(jest-preset-angular|@angular|ng2-charts|chart.js|@testing-library|dom-accessibility-api|lodash-es)/)'
+  ],
+  moduleFileExtensions: ['ts', 'js', 'mjs', 'cjs, html', 'json'],
+  testEnvironment: 'json'
 };
