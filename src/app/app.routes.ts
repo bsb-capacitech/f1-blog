@@ -28,6 +28,12 @@ export const routes: Routes = [
       import('./features/blog/pages/post-form/post-form.component')
         .then(c => c.PostFormComponent)
   },
+  {
+    path: 'compare',
+    loadComponent: () => 
+      import('./features/compare/pages/driver-compare/driver-compare.component')
+        .then(c => c.DriverCompareComponent)
+  },
   { path: '', redirectTo: 'races', pathMatch: 'full' },
   { path: '**', redirectTo: 'races' }
 ];

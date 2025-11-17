@@ -54,6 +54,9 @@ import { RouterModule } from '@angular/router';
             <a class="navbar-item" routerLink="/blog" routerLinkActivate="is-active">
               Blog
             </a>
+            <a class="navbar-item" routerLink="/compare" routerLinkActive="is-active">
+              👤 vs 👤
+            </a>
           </div>
         </div>
       </div>
