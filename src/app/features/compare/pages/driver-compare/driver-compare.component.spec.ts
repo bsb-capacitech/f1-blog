@@ -76,7 +76,7 @@ describe('DriverCompareComponent (integration)', () => {
     fireEvent.click(screen.getByText('Lewis Hamilton'));
     fireEvent.click(screen.getByText('Charles Leclerc'));
 
-    const selectedBadges = container.querySelectorAll('.mt-4.tag.is-warning');
+    const selectedBadges = container.querySelectorAll('.mt-4 .tag.is-warning');
 
     expect(selectedBadges.length).toBe(2);
   });

@@ -1,185 +1,38 @@
-ng g c features/compare/pages/driver-compare --standalone --skip-import
+ng g s core/services/favorites
 
-driver-compare.component (v1)
+ng g c shared/components/favorite-heart --standalone --skip-import
+
+ng g interceptor core/interceptors/caching
+
+favorite-heart.spec
+@Component({
+  selector: 'host-test',
+  standalone: true,
+  imports: [FavoriteHeartComponent],
   template: `
-    <section class="section">
-      <div class="container">
-        <h1 class="title has-text-warning has-text-centered">Comparador de Pilotos</h1>
-        
-        <div class="box f1-card">
-          <!-- Formulário de seleção será implementado nos próximos passos -->
-        </div>
-
-        <!-- Área de comparação será implementada nso próximos passos -->
-      </div>
-    </section>
+    <app-favorite-heart
+      [itemId]="itemId"
+      [type]="type"
+      (favoriteToggled)="onToggle($event)"
+    ></app-favorite-heart>
   `,
-  styles: [`
-    .f1-card {
-      background: linear-gradient(135deg, #1f1f27 0%, #15151e 100%);
-      border: 1px solid #333;
-    }
-  `]
-driver-compare.component (v2)
-  template: `
-    <section class="section">
-      <div class="container">
-        <h1 class="title has-text-warning has-text-centered">Comparador de Pilotos</h1>
-        
-        <!-- Lista de pilotos -->
-        @if (!isLoading()) {
-          <div class="tags">
-            @for (driver of drivers(); track driver.driver_number) {
-              <span class="tag is-info is-clickable" (click)="addDriver(driver.driver_number)" [class.is-light]="isDriverSelected(driver.driver_number)">
-                {{ driver.full_name }}
-              </span>
-            }
-          </div>
-        } @else {
-          <p>Carregando pilotos...</p>
-        }
+})
+class HostComponent {
+  itemId = 33;
+  type: any = 'driver';
+  outputSpy = jest.fn();
 
-        <!-- Badges selecionados -->
-        <div class="mt-4">
-          @for (driverNum of selectedDriverNumbers(); track driverNum) {
-            <span class="tag is-warning is-medium mr-2">
-            {{ getDriverName(driverNum) }}
-              <button class="delete is-small ml-2" (click)="removeDriver(driverNum)"></button>
-            </span>
-          }
-        </div>
+  onToggle(e: any) {
+    this.outputSpy(e);
+  }
+}
 
-        <!-- Botão limpar -->
-        @if (selectedDriverNumbers().length > 0) {
-          <button class="button is-danger mt-3" (click)="clearAll()">Limpar Seleção</button>
-        }
-
-        <!-- Área de comparação será implementada nso próximos passos -->
-      </div>
-    </section>
-  `
-driver-compare.component (v3)
-  template: `
-    <section class="section">
-      <div class="container">
-        <!-- ... -->
-
-        <!-- Área de comparação será implementada nso próximos passos -->
-        <!-- Cards de Comparação -->
-        @if (comparisonData().length > 0) {
-          <div class="columns is-variable is-8 mt-5">
-            @for (data of comparisonData(); track data.driver_number) {
-              <div class="column is-half">
-                <div class="card f1-card">
-                  <header class="card-header has-background-dark">
-                    <p class="card-header-title has-text-warning">
-                      {{ data.country_code | countryFlag }} 
-                      {{ data.full_name }}
-                    </p>
-                  </header>
-                  <div class="card-content">
-                    <table class="table is-bordered is-fullwidth has-text-white">
-                      <tbody>
-                        <tr><td><strong>Equipe</strong></td><td>{{ data.team_name }}</td></tr>
-                        <tr><td><strong>Pontos</strong></td><td class="has-text-warning">{{ data.points }}</td></tr>
-                        <tr><td><strong>Vitórias</strong></td><td>{{ data.wins }}</td></tr>
-                        <tr><td><strong>Poles</strong></td><td>{{ data.poles }}</td></tr>
-                        <tr><td><strong>Pódios</strong></td><td>{{ data.podiums }}</td></tr>
-                        <tr><td><strong>Posição média</strong></td><td>{{ data.avg_finish }}</td></tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </section>
-  `,
-  styles: [`
-    /* ... */
-    .f1-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 16px rgba(225, 6, 0, 0.3);
-    }
-    .table {
-      background: transparent;
-    }
-    .table td {
-      background: rgba(255, 255, 255, 0.05);
-      border-color: #333;
-    }
-  `]
-driver-compare.component (v4)
-  template: `
-    <section class="section">
-      <div class="container">
-        <!-- ... -->
-
-        <!-- Gráfico de Comparação -->
-        @if (comparisonData().length === 2) {
-          <div class="section">
-            <div class="box chart-container">
-              <h2 class="title is-4 has-text-warning has-text-centered mb-5">Comparação Visual</h2>
-              <div class="chart-wrapper">
-                <canvas 
-                  baseChart
-                  [type]="barChartType"
-                  [data]="barChartData"
-                  [options]="barChartOptions">
-                </canvas>
-              </div>
-            </div>
-          </div>
-        } @else if (selectedDriverNumbers().length === 1) {
-          <div class="notification is-info is-light mt-5 has-text-centered">
-            Selecione mais um piloto para ver a comparação completa! 🏎️
-          </div>
-        } @else {
-          <p class="has-text-grey-light">Selecione dois pilotos para comparar.</p>
-        }
-      </div>
-    </section>
-  `,
-  styles: [`
-    /* ... */
-    .chart-wrapper {
-      position: relative;
-      height: 400px;
-      width: 100%;
-    }
-    .chart-container {
-      background: linear-gradient(135deg, #1f1f27 0%, #15151e 100%);
-      border: 1px solid #e10600;
-      border-radius: 8px;
-      padding: 2rem;
-    }
-  `]
-
-driver-compare.component (v5)
-  styles: [`
-    /* ... */
-    @media (max-width: 768px) {
-      .columns.is-variable.is-8 {
-        margin: 0;
-      }
-      .column.is-half {
-        padding: 0.5rem;
-      }
-      .chart-wrapper {
-        height: 300px;
-      }
-    }
-  `]
-
-app.routes
-  {
-    path: 'compare',
-    loadComponent: () => 
-      import('./features/blog/pages/driver-compare/driver-compare.component')
-        .then(c => c.DriverCompareComponent)
-  },
-
-npm i @angular/cdk@19
-npm i chart.js ng2-charts@7
+favorites-list.spec
+const mockF1Api = {
+    getDrivers: jest.fn(() => of([
+      { driver_number: 1, full_name: 'Driver 1', headshot_url: 'x', team_name: 'Team A' }
+    ])),
+    getSessions: jest.fn(() => of([
+      { session_key: 101, country_code: 'BR', circuit_short_name: 'Interlagos', date_start: new Date() }
+    ])),
+  };
