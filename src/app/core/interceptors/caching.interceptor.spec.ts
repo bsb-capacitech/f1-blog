@@ -11,7 +11,7 @@ describe('cachingInterceptor', () => {
   it('should cache response ande reuse it within the valid period', async () => {
     const request = new HttpRequest('GET', '/api/sessions');
     const handlerFn: HttpHandlerFn = jest.fn(() => of(new HttpResponse({ body: [{ id: 1 }] })));
-    const handler: HttpHandlerFn = handlerFn;
+    const handler = { handle: handlerFn };
 
     const firstCall = await firstValueFrom(cachingInterceptor(request, handler));
     expect((firstCall as HttpResponse<any>).body).toEqual([{ id: 1 }]);
@@ -25,7 +25,7 @@ describe('cachingInterceptor', () => {
   it('should ignore cache for dynamic endpoints (laps, results)', async () => {
     const request = new HttpRequest('GET', '/api/laps');
     const handlerFn: HttpHandlerFn = jest.fn(() => of(new HttpResponse({ body: [{ lap: 1 }] })));
-    const handler: HttpHandlerFn = handlerFn;
+    const handler = { handle: handlerFn };
 
     await firstValueFrom(cachingInterceptor(request, handler));
     expect(handlerFn).toHaveBeenCalledTimes(1);
@@ -36,7 +36,7 @@ describe('cachingInterceptor', () => {
 
     const request = new HttpRequest('GET', '/api/sessions');
     const handlerFn: HttpHandlerFn = jest.fn(() => of(new HttpResponse({ body: [{ id: 2 }] })));
-    const handler: HttpHandlerFn = handlerFn;
+    const handler = { handle: handlerFn };
 
     await firstValueFrom(cachingInterceptor(request, handler) as any);
     jest.advanceTimersByTime(5 * 60 * 1000 + 1);

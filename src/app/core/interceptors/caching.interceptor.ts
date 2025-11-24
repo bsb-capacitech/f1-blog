@@ -1,4 +1,4 @@
-import { HttpEvent, HttpHandler, HttpInterceptorFn, HttpRequest, HttpResponse } from '@angular/common/http';
+import { HttpEvent, HttpHandler, HttpRequest, HttpResponse } from '@angular/common/http';
 import { Observable, of, tap } from 'rxjs';
 
 export const cache = new Map<string, { timestamp: number; data: any }>();

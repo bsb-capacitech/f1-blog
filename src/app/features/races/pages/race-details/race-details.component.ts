@@ -39,6 +39,8 @@ interface DriverRaceResult {
           ({{ raceInfo()?.date_start | date:'mediumDate' }})
         </h3>
 
+        <span class="best-lap">*Volta mais rápida</span>
+
         @if (isLoading()) {
           <div class="has-text-centered mt-6">
             <div class="loader"></div>
@@ -47,37 +49,49 @@ interface DriverRaceResult {
         } @else if (error()) {
           <div class="notification is-danger has-text-centered">{{ error() }}</div>
         } @else {
-          <table class="table is-striped is-hoverable is-fullwidth has-text-centered mt-5">
-            <thead>
-              <tr>
-                <th>Posição</th>
-                <th>Piloto</th>
-                <th>Equipe</th>
-                <th>Voltas</th>
-                <th>Melhor Volta</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (result of results(); track result.driver_number) {
-                <tr [ngClass]="getRowClass(result)">
-                  <td>
-                    @switch (result.position) {
-                      @case (1) {<span>🏆 </span><strong>{{ result.position }}</strong>}
-                      @case (2) {<span>🥈 </span><strong>{{ result.position }}</strong>}
-                      @case (3) {<span>🥉 </span><strong>{{ result.position }}</strong>}
-                      @default {<strong>{{ result.position }}</strong>}
-                    }
-                  </td>
-                  <td>{{ result.full_name }}</td>
-                  <td>{{ result.team_name }}</td>
-                  <td>{{ result.laps_completed }}</td>
-                  <td>{{ result.lap_time_best | lapTime }}</td>
-                  <td>{{ result.status }}</td>
+          <div class="table-container">
+            <table class="table is-striped is-hoverable is-fullwidth has-text-centered mt-5">
+              <thead>
+                <tr>
+                  <th class="is-hidden-mobile">Posição</th>
+                  <th>Piloto</th>
+                  <th class="is-hidden-touch">Equipe</th>
+                  <th class="is-hidden-mobile">Voltas</th>
+                  <th>Melhor Volta</th>
+                  <th class="is-hidden-mobile">Status</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (result of results(); track result.driver_number) {
+                  <tr [ngClass]="getRowClass(result)">
+                    <td class="is-hidden-mobile">
+                      @switch (result.position) {
+                        @case (1) {<span>🏆 </span><strong>{{ result.position }}</strong>}
+                        @case (2) {<span>🥈 </span><strong>{{ result.position }}</strong>}
+                        @case (3) {<span>🥉 </span><strong>{{ result.position }}</strong>}
+                        @default {<strong>{{ result.position }}</strong>}
+                      }
+                    </td>
+                    <td>
+                      <div class="driver-info-mobile is-flex is-align-items-center">
+                        <span class="position-mobile is-hidden-tablet mr-2">
+                          {{ result.position }}
+                        </span>
+                        {{ result.full_name }}
+                      </div>
+                      <div class="is-hidden-tablet has-text-grey-light is-size-7">
+                        {{ result.team_name }} • {{ result.laps_completed }} voltas
+                      </div>
+                    </td>
+                    <td class="is-hidden-touch">{{ result.team_name }}</td>
+                    <td class="is-hidden-mobile">{{ result.laps_completed }}</td>
+                    <td>{{ result.lap_time_best | lapTime }}</td>
+                    <td class="is-hidden-mobile">{{ result.status }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
         }
 
         <!-- Conteúdo será implementado nos próximos passos -->
@@ -101,6 +115,30 @@ interface DriverRaceResult {
     .points-position { background-color: rgba(52, 152, 219, 0.15) !important; }
     .podium-first { background-color: rgba(46, 204, 113, 0.2) !important; }
     .best-lap { background-color: rgba(241, 196, 15, 0.2) !important; }
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .driver-info-mobile {
+      min-height: 40px;
+    }
+    .position-mobile {
+      background: #e10600;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    @media (max-width: 768px) {
+      .table {
+        font-size: 0.875rem;
+      }
+    }
   `]
 })
 export class RaceDetailsComponent implements OnInit {

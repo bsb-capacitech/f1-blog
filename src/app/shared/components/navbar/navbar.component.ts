@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 @Component({
@@ -41,9 +41,24 @@ import { RouterModule } from '@angular/router';
               </g>
             </svg>
           </a>
+
+          <a
+            role=button
+            class="navbar-burger"
+            aria-label="menu"
+            aria-expanded="false"
+            aria-target="navbarBasicExample"
+            (click)="toggleMenu()"
+            [class.is-active]="isMenuActive()"
+          >
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
         </div>
 
-        <div class="navbar-menu">
+        <div id="navbarBasicExample" class="navbar-menu" [class.is-active]="isMenuActive()">
           <div class="navbar-start">
             <a class="navbar-item" routerLink="/races" routerLinkActivate="is-active" aria-current="page">
               Corridas
@@ -70,8 +85,31 @@ import { RouterModule } from '@angular/router';
       background: #e10600 !important;
       color: white !important;
     }
+    .navbar-item.is-active {
+      background-color: #e10600 !important;
+      color: white !important;
+    }
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .navbar-menu {
+        background-color: #15151e;
+        border-top: 1px solid #e10600;
+      }
+      
+      .navbar-item {
+        text-align: center;
+        
+        &:hover {
+          background-color: #1f1f27;
+        }
+      }
+    }
   `]
 })
 export class NavbarComponent {
+  isMenuActive = signal<boolean>(false);
 
+  toggleMenu(): void {
+    this.isMenuActive.update(active => !active);
+  }
 }

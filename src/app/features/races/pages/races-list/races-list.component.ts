@@ -7,10 +7,11 @@ import { Router, RouterModule } from '@angular/router';
 import { CountryFlagPipe } from '../../../../shared/pipes/country-flag.pipe';
 import { RaceStoreService } from '../../services/race-store.service';
 import { FavoriteHeartComponent } from '../../../../shared/components/favorite-heart/favorite-heart.component';
+import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton/loading-skeleton.component';
 
 @Component({
   selector: 'app-races-list',
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, CountryFlagPipe, FavoriteHeartComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, CountryFlagPipe, FavoriteHeartComponent, LoadingSkeletonComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="section">
@@ -31,9 +32,12 @@ import { FavoriteHeartComponent } from '../../../../shared/components/favorite-h
         </div>
 
         @if(loading()){
-          <div class="has-text-centered">
-            <div class="loader"></div>
-            <p class="has-text-white">Carregando corridas...</p>
+          <div class="columns is-multiline">
+            @for (item of [1,2,3,4,5,6]; track item) {
+              <div class="column is-3-desktop is-6-tablet">
+                <app-loading-skeleton type="card"></app-loading-skeleton>
+              </div>
+            }
           </div>
         } @else if (error()) {
           <div class="notification is-danger">{{ error() }}</div>
@@ -118,6 +122,7 @@ export class RacesListComponent implements OnInit {
   error = signal<string | null>(null);
 
   seasonFilter = new FormControl('2025');
+  seasonFilterSignal = signal<string>('2025');
 
   filteredRaces = computed(() => {
     const season = this.seasonFilter.value;
@@ -125,13 +130,19 @@ export class RacesListComponent implements OnInit {
   });
 
   ngOnInit() {
+    this.seasonFilter.valueChanges.subscribe(value => {
+      this.seasonFilterSignal.set(value ?? '2025');
+      this.loadRace();
+    });
+
+    this.seasonFilterSignal.set(this.seasonFilter.value ?? '2025');
     this.loadRace();
   };
 
   loadRace() {
     this.f1ApiService.getSessions().subscribe({
       next: (sessions) => {
-        const raceSessions: Session[] = sessions.filter(session => session.session_type === 'Race');
+        const raceSessions: Session[] = sessions.filter(session => session.session_type === 'Race' && session.date_start.includes(this.seasonFilterSignal() || '2025'));
         const enrichedSessions: Session[] = raceSessions.map(session => ({
           ...session,
           country_code: this.countryService.getCountryCode(session.country_key)

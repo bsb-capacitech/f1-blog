@@ -1,206 +1,333 @@
-ng g s core/services/favorites
+npm run test
+npm run test:coverage
 
-npm i @fortawesome/angular-fontawesome@1.0.0
-npm i @fortawesome/free-solid-svg-icons
+angular.json
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2MB",
+                  "maximumError": "2MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kB",
+                  "maximumError": "4kB"
+                }
+              ],
+              "outputHashing": "all",
+              "optimization": true,
+              "sourceMap": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "statsJson": true
+            },
 
-ng g c shared/components/favorite-heart --standalone --skip-import
+ng g c shared/components/loading-skeleton/loading-skeleton --standalone --skip-import
 
-favorite-heart.component
+loading-skeleton.component
   template: `
-    <button
-      class="button is-ghost favorite-btn"
-      (click)="onToggle()"
-      [class.is-favorite]="isFavorite()"
-      [attr.aria-pressed]="isFavorite()"
-      [attr.aria-label]="isFavorite() ? 'Remover dos favoritos' : 'Adicionar aos favoritos'"
-    >
-      <span class="icon is-small">
-        @if (isFavorite()) {
-          <fa-icon [icon]="'heart'" class="has-text-danger" aria-hidden="true" />
-        } @else {
-          <fa-icon [icon]="'heart'" class="has-text-grey-light" aria-hidden="true" />
-        }
-      </span>
-    </button>
+    <div class="skeleton-container" [class]="type()" role="skeleton">
+      @if (type() === 'card') {
+        <div class="card fi-card is-loading">
+          <div class="card-image">
+            <div class="skeleton-image"></div>
+          </div>
+          <div class="card-content">
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line medium"></div>
+            <div class="skeleton-line long"></div>
+          </div>
+        </div>
+      }
+      @else if (type() === 'table') {
+        <div class="table-skeleton">
+          @for (row of [1,2,3,4,5]; track row) {
+            <div class="skeleton-row">
+              @for (col of [1,2,3,4,5,6]; track col) {
+                <div class="skeleton-cell" [class]="'width-' + col"></div>
+              }
+            </div>
+          }
+        </div>
+      }
+      @else if (type() === 'text') {
+        <div class="text-skeleton">
+          <div class="skeleton-line" [class]="size()"></div>
+        </div>
+      }
+    </div>
   `,
   styles: [`
-    .favorite-btn {
-      transition: all 0.3s ease;
-      border: none;
-      background: transparent;
+    .skeleton-container {
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    
+    .is-loading {
+      opacity: 0.7;
+    }
+    
+    .skeleton-image {
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(90deg, #2a2a3a 25%, #3a3a4a 50%, #2a2a3a 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 4px;
+    }
+    
+    .skeleton-line {
+      height: 12px;
+      background: linear-gradient(90deg, #2a2a3a 25%, #3a3a4a 50%, #2a2a3a 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 4px;
+      margin-bottom: 8px;
       
-      &:hover {
-        transform: scale(1.08);
-        transition: transform .15s;
+      &.short {
+        width: 60%;
       }
       
-      &.is-favorite {
-        animation: pulse .45s ease;
+      &.medium {
+        width: 80%;
+      }
+      
+      &.long {
+        width: 100%;
+      }
+      
+      &.title {
+        height: 20px;
+        margin-bottom: 12px;
+      }
+      
+      &.subtitle {
+        height: 16px;
+        margin-bottom: 10px;
+      }
+    }
+    
+    .table-skeleton {
+      width: 100%;
+    }
+    
+    .skeleton-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .skeleton-cell {
+      height: 20px;
+      background: linear-gradient(90deg, #2a2a3a 25%, #3a3a4a 50%, #2a2a3a 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+      border-radius: 4px;
+      flex: 1;
+      
+      &.width-1 { flex: 0.5; }
+      &.width-2 { flex: 1; }
+      &.width-3 { flex: 1.5; }
+      &.width-4 { flex: 2; }
+      &.width-5 { flex: 1; }
+      &.width-6 { flex: 0.8; }
+    }
+    
+    @keyframes loading {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
       }
     }
     
     @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.25); }
-      100% { transform: scale(1); }
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.7;
+      }
     }
   `]
 
 drivers-list.component
-                  <div class="card-header">
-                    <app-favorite-heart 
-                      [itemId]="driver.driver_number" 
-                      [type]="'driver'"
-                      (favoriteToggled)="onFavoriteToggled($event)">
-                    </app-favorite-heart>
-                  </div>
+          <div class="columns is-multiline">
+            @for (item of [1,2,3,4,5,6]; track item) {
+              <div class="column is-3-desktop is-6-tablet">
+                <app-loading-skeleton type="card"></app-loading-skeleton>
+              </div>
+            }
+          </div>
 
 races-list.component
-                    <div class="card-header">
-                      <app-favorite-heart 
-                        [itemId]="race.session_key" 
-                        [type]="'race'"
-                        (favoriteToggled)="onFavoriteToggled($event)">
-                      </app-favorite-heart>
-                    </div>
-
-app.routes.ts
-  {
-    path: 'favorites',
-    loadComponent: () =>
-      import('./features/favorites/pages/favorites-list/favorites-list.component')
-        .then(c => c.FavoritesListComponent)
-  },
-
-ng g interceptor core/interceptors/caching
-
-ng g c features/favorites/pages/favorites-list --standalone --skip-import
-
-favorites-list.component
-  template: `
-    <section class="section">
-      <div class="container">
-        <h1 class="title has-text-warning has-text-centered">Meus Favoritos</h1>
-
-        <!-- Abas -->
-        <div class="tabs is-centered">
-          <ul>
-            <li [class.is-active]="activeTab() === 'drivers'">
-              <a (click)="setActiveTab('drivers')">Pilotos</a>
-            </li>
-            <li [class.is-active]="activeTab() === 'races'">
-              <a (click)="setActiveTab('races')">Corridas</a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Pilotos Favoritos -->
-        @if (activeTab() === 'drivers') {
-          <div class="content">
-            <h2 class="subtitle has-text-light">Pilotos Favoritos</h2>
-            
-            @if (favoriteDriversData().length === 0) {
-              <div class="has-text-centered py-6">
-                <p class="has-text-light">Nenhum piloto favoritado ainda.</p>
-                <a class="button is-warning mt-3" routerLink="/drivers">
-                  Explorar Pilotos
-                </a>
-              </div>
-            } @else {
-              <div class="columns is-multiline">
-                @for (driver of favoriteDriversData(); track driver.driver_number) {
-                  <div class="column is-3-desktop is-6-tablet">
-                    <div class="card f1-card has-text-centered">
-                      <div class="card-header">
-                        <app-favorite-heart 
-                          [itemId]="driver.driver_number" 
-                          [type]="'driver'">
-                        </app-favorite-heart>
-                      </div>
-                      <div class="card-image">
-                        <figure class="image is-128x128 is-inline-block">
-                          <img [src]="driver.headshot_url" [alt]="driver.full_name" class="is-rounded">
-                        </figure>
-                      </div>
-                      <div class="card-content">
-                        <p class="title is-4 has-text-warning">{{ driver.full_name }}</p>
-                        <p class="subtitle is-6 has-text-light">
-                          #{{ driver.driver_number }} — {{ driver.team_name }}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                }
+          <div class="columns is-multiline">
+            @for (item of [1,2,3,4,5,6]; track item) {
+              <div class="column is-3-desktop is-6-tablet">
+                <app-loading-skeleton type="card"></app-loading-skeleton>
               </div>
             }
           </div>
-        }
 
-        <!-- Corridas Favoritas -->
-        @if (activeTab() === 'races') {
-          <div class="content">
-            <h2 class="subtitle has-text-light">Corridas Favoritas</h2>
-            
-            @if (favoriteRacesData().length === 0) {
-              <div class="has-text-centered py-6">
-                <p class="has-text-light">Nenhuma corrida favoritada ainda.</p>
-                <a class="button is-warning mt-3" routerLink="/races">
-                  Explorar Corridas
-                </a>
-              </div>
-            } @else {
-              <div class="columns is-multiline">
-                @for (race of favoriteRacesData(); track race.session_key) {
-                  <div class="column is-one-third">
-                    <div class="card f1-card">
-                      <div class="card-header">
-                        <app-favorite-heart 
-                          [itemId]="race.session_key" 
-                          [type]="'race'">
-                        </app-favorite-heart>
-                      </div>
-                      <div class="card-content">
-                        <p class="title is-4 has-text-warning">
-                          {{ race.country_code}} • 
-                          {{ race.circuit_short_name }}
-                        </p>
-                        <p class="subtitle is-6 has-text-light">
-                          {{ race.date_start | date:'dd/MM/yy' }}
-                        </p>
-                        <a class="button is-info is-light is-small mt-3" [routerLink]="['/races', race.session_key]">
-                          Ver Detalhes
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        }
-      </div>
-    </section>
-  `,
+navbar.component
   styles: [`
-    .f1-card {
-      background: linear-gradient(135deg, #1f1f27 0%, #15151e 100%);
-      border: 1px solid #e10600;
-      transition: transform 0.2s ease;
+    .navbar-item.is-active {
+      background-color: #e10600 !important;
+      color: white !important;
     }
-    .f1-card:hover {
-      transform: translateY(-2px);
-    }
-    .tabs a {
-      color: #fff;
-      border-bottom-color: #e10600;
-    }
-    .tabs li.is-active a {
-      color: #e10600;
-      border-bottom-color: #e10600;
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .navbar-menu {
+        background-color: #15151e;
+        border-top: 1px solid #e10600;
+      }
+      
+      .navbar-item {
+        text-align: center;
+        
+        &:hover {
+          background-color: #1f1f27;
+        }
+      }
     }
   `]
 
-navbar.component
-            <a class="navbar-item" routerLink="/favorites" routerLinkActive="is-active">
-              💛 Favoritos
-            </a>
+race-details.component
+          <div class="table-container">
+            <table class="table is-striped is-hoverable is-fullwidth has-text-centered mt-5">
+              <thead>
+                <tr>
+                  <th class="is-hidden-mobile">Posição</th>
+                  <th>Piloto</th>
+                  <th class="is-hidden-touch">Equipe</th>
+                  <th class="is-hidden-mobile">Voltas</th>
+                  <th>Melhor Volta</th>
+                  <th class="is-hidden-mobile">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (result of results(); track result.driver_number) {
+                  <tr [ngClass]="getRowClass(result)">
+                    <td class="is-hidden-mobile">
+                      @switch (result.position) {
+                        @case (1) {<span>🏆 </span><strong>{{ result.position }}</strong>}
+                        @case (2) {<span>🥈 </span><strong>{{ result.position }}</strong>}
+                        @case (3) {<span>🥉 </span><strong>{{ result.position }}</strong>}
+                        @default {<strong>{{ result.position }}</strong>}
+                      }
+                    </td>
+                    <!-- <td>{{ result.full_name }}</td> -->
+                    <td>
+                      <div class="driver-info-mobile is-flex is-align-items-center">
+                        <span class="position-mobile is-hidden-tablet mr-2">
+                          {{ result.position }}
+                        </span>
+                        {{ result.full_name }}
+                      </div>
+                      <div class="is-hidden-tablet has-text-grey-light is-size-7">
+                        {{ result.team_name }} • {{ result.laps_completed }} voltas
+                      </div>
+                    </td>
+                    <td class="is-hidden-touch">{{ result.team_name }}</td>
+                    <td class="is-hidden-mobile">{{ result.laps_completed }}</td>
+                    <td>{{ result.lap_time_best | lapTime }}</td>
+                    <td class="is-hidden-mobile">{{ result.status }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+  styles: [`
+    /* ... */
+    .table-container {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .driver-info-mobile {
+      min-height: 40px;
+    }
+    .position-mobile {
+      background: #e10600;
+      color: white;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+    @media (max-width: 768px) {
+      .table {
+        font-size: 0.875rem;
+      }
+    }
+  `]
+
+ng g c shared/components/error-boundary/error-boundary
+
+error-boundary.component
+  template: `
+    <div class="error-boundary notification is-danger">
+      <div class="content has-text-centered">
+        <p class="title is-5 has-text-white">
+          <span class="icon">⚠️</span>
+          Algo deu errado
+        </p>
+        
+        <p class="has-text-light mb-3">{{ message() }}</p>
+        
+        <div class="buttons is-centered">
+          <button class="button is-warning" (click)="onRetry.emit()">
+            Tentar Novamente
+          </button>
+          <button class="button is-light" (click)="onGoHome.emit()">
+            Ir para Início
+          </button>
+        </div>
+        
+        @if (showDetails()) {
+          <details class="mt-3">
+            <summary class="has-text-light is-size-7">Detalhes técnicos</summary>
+            <pre class="has-text-light is-size-7 mt-2"><code>{{ errorDetails() }}</code></pre>
+          </details>
+        }
+      </div>
+    </div>
+  `,
+  styles: [`
+    .error-boundary {
+      border: 1px solid #e10600;
+      background: linear-gradient(135deg, #2a1a1a 0%, #15151e 100%);
+    }
+    
+    details {
+      border: 1px solid #444;
+      border-radius: 4px;
+      padding: 8px;
+      
+      summary {
+        cursor: pointer;
+        outline: none;
+      }
+      
+      pre {
+        background: #1a1a1a;
+        padding: 8px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+    }
+  `]
+
+npm run test
+npm run test:coverage
+
+ng build --configuration=production
+
+git add .
+git commit -m “Projeto finalizado”
+git remote ...
+git push ...

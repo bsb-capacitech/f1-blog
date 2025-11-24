@@ -4,7 +4,7 @@ import '@testing-library/jest-dom';
 
 setupZoneTestEnv();
 
-jest.mock('@fontawesome/angular-fontawesome', () => {
+jest.mock('@fortawesome/angular-fontawesome', () => {
   const { Component, Input } = require('@angular/core');
 
   @Component({

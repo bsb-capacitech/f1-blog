@@ -30,7 +30,9 @@ describe('DriversListComponent', () => {
       ]
     })
     
-    expect(screen.getByText(/carregando pilotos/i)).toBeTruthy();
+    // expect(screen.getByText(/carregando pilotos/i)).toBeTruthy();
+    const skeletons = screen.getAllByRole('skeleton');
+    expect(skeletons.length).toBe(6);
   });
 
   it('should render driver cards after loading data', async () => {

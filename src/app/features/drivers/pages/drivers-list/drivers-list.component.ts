@@ -6,10 +6,11 @@ import { CountryFlagPipe } from '../../../../shared/pipes/country-flag.pipe';
 import { F1ApiService, Driver } from '../../../../core/services/f1-api.service';
 import { DriverCountryService } from './driver-country.service';
 import { FavoriteHeartComponent } from '../../../../shared/components/favorite-heart/favorite-heart.component';
+import { LoadingSkeletonComponent } from '../../../../shared/components/loading-skeleton/loading-skeleton/loading-skeleton.component';
 
 @Component({
   selector: 'app-drivers-list',
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, CountryFlagPipe, FavoriteHeartComponent],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, CountryFlagPipe, FavoriteHeartComponent, LoadingSkeletonComponent],
   template: `
     <section class="section">
       <div class="container">
@@ -30,9 +31,12 @@ import { FavoriteHeartComponent } from '../../../../shared/components/favorite-h
         </div>
 
         @if (isLoading()) {
-          <div class="has-text-centered mt-5">
-            <div class="loader"></div>
-            <p class="has-text-light">Carregando pilotos...</p>
+          <div class="columns is-multiline">
+            @for (item of [1,2,3,4,5,6]; track item) {
+              <div class="column is-3-desktop is-6-tablet">
+                <app-loading-skeleton type="card"></app-loading-skeleton>
+              </div>
+            }
           </div>
         } @else if (error()) {
           <div class="notification is-danger has-text-centered">{{ error() }}</div>

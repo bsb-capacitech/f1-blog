@@ -1,0 +1,12 @@
+toml
+[build]
+  command = "ng build --configuration=production"
+  publish = "dist/f1-blog/browser"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status= 200

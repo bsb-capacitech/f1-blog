@@ -46,7 +46,9 @@ describe('RacesListComponent', () => {
   it('should show loading state initially', () => {
     component.loading.set(true);
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Carregando corridas...');
+
+    const skeletons = fixture.nativeElement.querySelectorAll('[role]="skeleton"')
+    expect(skeletons.length).toBe(6);
   });
 
   it('should filter races when seasonFilter changes', () => {
