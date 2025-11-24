@@ -47,7 +47,7 @@ describe('RacesListComponent', () => {
     component.loading.set(true);
     fixture.detectChanges();
 
-    const skeletons = fixture.nativeElement.querySelectorAll('[role]="skeleton"')
+    const skeletons = fixture.nativeElement.querySelectorAll('[role="skeleton"]')
     expect(skeletons.length).toBe(6);
   });
 
