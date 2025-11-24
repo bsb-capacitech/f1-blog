@@ -34,6 +34,12 @@ export const routes: Routes = [
       import('./features/compare/pages/driver-compare/driver-compare.component')
         .then(c => c.DriverCompareComponent)
   },
+  {
+    path: 'favorites',
+    loadComponent: () =>
+      import('./features/favorites/pages/favorites-list/favorites-list.component')
+        .then(c => c.FavoritesListComponent)
+  },
   { path: '', redirectTo: 'races', pathMatch: 'full' },
   { path: '**', redirectTo: 'races' }
 ];

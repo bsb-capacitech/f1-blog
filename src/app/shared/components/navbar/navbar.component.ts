@@ -57,6 +57,9 @@ import { RouterModule } from '@angular/router';
             <a class="navbar-item" routerLink="/compare" routerLinkActive="is-active">
               👤 vs 👤
             </a>
+            <a class="navbar-item" routerLink="/favorites" routerLinkActive="is-active">
+              💛 Favoritos
+            </a>
           </div>
         </div>
       </div>

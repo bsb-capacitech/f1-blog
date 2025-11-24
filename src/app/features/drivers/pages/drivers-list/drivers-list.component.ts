@@ -5,10 +5,11 @@ import { RouterModule } from '@angular/router';
 import { CountryFlagPipe } from '../../../../shared/pipes/country-flag.pipe';
 import { F1ApiService, Driver } from '../../../../core/services/f1-api.service';
 import { DriverCountryService } from './driver-country.service';
+import { FavoriteHeartComponent } from '../../../../shared/components/favorite-heart/favorite-heart.component';
 
 @Component({
   selector: 'app-drivers-list',
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, CountryFlagPipe],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, CountryFlagPipe, FavoriteHeartComponent],
   template: `
     <section class="section">
       <div class="container">
@@ -40,6 +41,13 @@ import { DriverCountryService } from './driver-country.service';
             @for (driver of filteredDrivers(); track driver.driver_number) {
               <div class="column is-3-desktop is-6-tablet">
                 <div class="card f1-card has-text-centered">
+                  <div class="card-header">
+                    <app-favorite-heart 
+                      [itemId]="driver.driver_number" 
+                      [type]="'driver'"
+                      (favoriteToggled)="onFavoriteToggled($event)">
+                    </app-favorite-heart>
+                  </div>
                   <div class="card-image">
                     <figure class="image is-128x128 is-inline-block">
                     <img [src]="getFallbackImageUrl(driver.full_name) || driver.headshot_url"
@@ -119,7 +127,7 @@ export class DriversListComponent implements OnInit {
     if (!selectedTeam) return allDrivers;
 
     return allDrivers.filter(driver => (driver.team_name ?? '').toLowerCase().includes(selectedTeam));
-  })
+  });
 
   ngOnInit() {
     this.teamFilter.valueChanges.subscribe(value => {
@@ -128,7 +136,7 @@ export class DriversListComponent implements OnInit {
     this.teamFilterSignal.set(this.teamFilter.value ?? '');
     
     this.loadDrivers();
-  }
+  };
 
   private loadDrivers() {
     this.f1ApiService.getDrivers().subscribe({
@@ -145,13 +153,13 @@ export class DriversListComponent implements OnInit {
         this.error.set('Erro ao carregar pilotos.');
         this.isLoading.set(false);
       }
-    })
-  }
+    });
+  };
 
   handleImageError(event: Event) {
     const img = event.target as HTMLImageElement;
     img.src = 'assets/driver-placeholder.jpg';
-  }
+  };
 
   getFallbackImageUrl(driver: string): string {
     if (driver === 'Kimi ANTONELLI') {
@@ -172,5 +180,9 @@ export class DriversListComponent implements OnInit {
     const fileName = `${firstName.slice(0, 3).toLowerCase()}${lastName.slice(0, 3).toLowerCase()}01.png`
 
     return `https://media.formula1.com/d_driver_fallback_image.png/content/dam/fom-website/drivers/${folder}/${initials}01_${firstName}_${lastName}/${fileName}`;
-  }
+  };
+
+  onFavoriteToggled(event: { id: number; type: 'driver' | 'race'; isFavorite: boolean }): void {
+    console.log(`Piloto ${event.id} ${event.isFavorite ? 'favoritado' : 'desfavoritado'}`);
+  };
 }

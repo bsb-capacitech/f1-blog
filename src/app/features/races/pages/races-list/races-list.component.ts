@@ -6,10 +6,11 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CountryFlagPipe } from '../../../../shared/pipes/country-flag.pipe';
 import { RaceStoreService } from '../../services/race-store.service';
+import { FavoriteHeartComponent } from '../../../../shared/components/favorite-heart/favorite-heart.component';
 
 @Component({
   selector: 'app-races-list',
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, CountryFlagPipe],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, CountryFlagPipe, FavoriteHeartComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section class="section">
@@ -42,8 +43,15 @@ import { RaceStoreService } from '../../services/race-store.service';
           <div class="columns is-multiline">
             @for (race of filteredRaces(); track race.session_key) {
               <div class="column is-one-third">
-                <a [routerLink]="['/races', race.session_key]" class="f1-card-link" (click)="goToRaceDetail(race)">
-                  <div class="card f1-card">
+                <div class="card f1-card">
+                  <div class="card-header">
+                    <app-favorite-heart 
+                      [itemId]="race.session_key" 
+                      [type]="'race'"
+                      (favoriteToggled)="onFavoriteToggled($event)">
+                    </app-favorite-heart>
+                  </div>
+                  <a [routerLink]="['/races', race.session_key]" class="f1-card-link" (click)="goToRaceDetail(race)">
                     <div class="card-content">
                       <p class="title is-4 has-text-warning">
                         <span>{{ race.country_code | countryFlag }}</span>
@@ -60,8 +68,8 @@ import { RaceStoreService } from '../../services/race-store.service';
                         <span class="tag is-inf is-light">Ver detalhes -></span>
                       </div>
                     </div>
-                  </div>
-                </a>
+                  </a>
+                </div>
               </div>
             }
           </div>
@@ -118,7 +126,7 @@ export class RacesListComponent implements OnInit {
 
   ngOnInit() {
     this.loadRace();
-  }
+  };
 
   loadRace() {
     this.f1ApiService.getSessions().subscribe({
@@ -137,10 +145,14 @@ export class RacesListComponent implements OnInit {
         this.loading.set(false);
       }
     });
-  }
+  };
 
   goToRaceDetail(race: Session) {
     this.raceStore.setRace(race);
     this.router.navigate(['/races', race.session_key]);
+  };
+
+  onFavoriteToggled(event: { id: number; type: 'driver' | 'race'; isFavorite: boolean }): void {
+    console.log(`Corrida ${event.id} ${event.isFavorite ? 'favoritada' : 'desfavoritada'}`);
   }
 }
